@@ -7,7 +7,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,39 +65,50 @@ import kotlinx.coroutines.withContext
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.lifecycle.ViewModelProvider
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.danceclub.account.Account
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
-    private lateinit var viewModel: MainViewModel
+    private lateinit var viewModel: RegistrationViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider
-                .AndroidViewModelFactory
-                .getInstance(application)
-        )[MainViewModel::class.java]
+
+        Log.d("Doing","Мы не крашнулись")
         setContent {
             DanceClubTheme {
                 navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "greetingScreen"){
+                NavHost(navController = navController, startDestination = "greetingScreen") {
                     composable("greetingScreen") {
                         GreetingScreen(navController = navController)
                     }
                     composable("registrationScreen") {
-                        RegistrationScreen(navController = navController, viewModel) //вызов вью из вьюмодели
+                        RegistrationScreen(navController = navController)
 
                     }
                     composable("authorizationScreen") {
-                        AuthorizationScreen(navController, viewModel)//вызов вью из вьюмодели
+                        AuthorizationScreen(navController)
+                    }
+                    composable("profileScreen") {
+                        ProfileScreen(navController)
+                    }
+                    composable("sectionsListScreen") {
+                        SectionsListScreen()
+                    }
+                    composable("signUpScreen") {
+                        SignUpScreen()
+                    }
+                    composable("scheduleScreen") {
+                        ScheduleScreen()
                     }
 
                 }
@@ -105,7 +120,7 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GreetingScreen(navController: NavHostController) { // экран добро пожаловать
+fun GreetingScreen(navController: NavHostController) {// экран добро пожаловать
     Scaffold(
         topBar = @Composable {
             TopAppBar(
@@ -162,8 +177,9 @@ fun GreetingScreen(navController: NavHostController) { // экран добро 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationScreen(
-    navController: NavHostController, viewModel: MainViewModel
+    navController: NavHostController
 ) {
+    val viewModel: RegistrationViewModel = viewModel()
 
     var textStateUsername by remember { mutableStateOf(TextFieldValue()) }
     var textStateName by remember { mutableStateOf(TextFieldValue()) }
@@ -346,7 +362,7 @@ fun RegistrationScreen(
                             }
                         else {
                             CoroutineScope(Dispatchers.IO).launch {
-                                if (viewModel.findAccount(username)!=null){  // вызов вьюмодели во вью!
+                                if (viewModel.findAccount(username) != null) {
                                     scope.launch {
                                         snackbarHostState.showSnackbar(
                                             "Такой аккаунт уже существует",
@@ -354,14 +370,13 @@ fun RegistrationScreen(
                                             duration = SnackbarDuration.Short
                                         )
                                     }
-                                }
-                                else {
-                                    viewModel.saveAccount( // вызов вьюмодели во вью!
+                                } else {
+                                    viewModel.saveAccount(
                                         Account(
                                             username, password, name
                                         )
                                     )
-                                    withContext(Dispatchers.Main){
+                                    withContext(Dispatchers.Main) {
                                         navController.navigate("greetingScreen") {
                                             popUpTo("greetingScreen") {
                                                 inclusive = true
@@ -386,13 +401,15 @@ fun RegistrationScreen(
     }
 
 }
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthorizationScreen(
-    navController: NavHostController,
-    viewModel: MainViewModel
+    navController: NavHostController
 ) {
+    val viewModel: AuthorizationViewModel = viewModel()
+
     var textStateUsername by remember { mutableStateOf(TextFieldValue()) }
     var textStatePassword by remember { mutableStateOf(TextFieldValue()) }
     var username by remember { mutableStateOf("") }
@@ -494,7 +511,7 @@ fun AuthorizationScreen(
             Button(
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
-                        val account = viewModel.findAccount(username) // вызов вьюмодели во вью!
+                        val account = viewModel.findAccount(username)
 
                         if (account == null) {
                             withContext(Dispatchers.Main) {
@@ -515,13 +532,12 @@ fun AuthorizationScreen(
                                 }
                             } else {
 
-                                        navController.navigate("sectionScreen") {
-                                            Log.d("Doing", "sectionScreen")
-                                            popUpTo("sectionScreen") {
-                                                inclusive = true
-                                            }
-                                        }
+                                navController.navigate("profileScreen") {
+                                    popUpTo("profileScreen") {
+                                        inclusive = true
                                     }
+                                }
+                            }
                         }
                     }
                 },
@@ -539,20 +555,96 @@ fun AuthorizationScreen(
 }
 
 
+@Composable
+fun ProfileScreen(navController: NavHostController){
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
 
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Image(
+                painter = painterResource(id = R.drawable.profile_image),
+                contentDescription = "Profile Image",
+                modifier = Modifier
+                    .size(160.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, Color.Gray, CircleShape)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "ФИО",
+                    style = TextStyle(fontSize = 24.sp),
+                    color = Color.Black
+                )
+                Text(
+                    text = "username",
+                    style = TextStyle(fontSize = 16.sp),
+                    color = Color.Gray
+                )
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            Text(
+                text = "Секции",
+                modifier = Modifier.clickable(onClick = { navController.navigate("sectionsListScreen") }),
+                style = TextStyle(textDecoration = TextDecoration.Underline,
+                    fontSize = 18.sp),
+                color = Color.Blue
+            )
+            Text(
+                text = "Запись",
+                modifier = Modifier.clickable(onClick = { navController.navigate("signUpScreen")  }),
+                style = TextStyle(textDecoration = TextDecoration.Underline,
+                    fontSize = 18.sp),
+                color = Color.Blue
+            )
+            Text(
+                text = "Расписание",
+                modifier = Modifier.clickable(onClick = { navController.navigate("scheduleScreen")  }),
+                style = TextStyle(textDecoration = TextDecoration.Underline,
+                    fontSize = 18.sp),
+                color = Color.Blue
+            )
+        }
+    }
+}
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun SectionsListScreen(){
+
+}
+@Composable
+fun SignUpScreen(){
+
+}
+
+@Composable
+fun ScheduleScreen(){
+
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     DanceClubTheme {
-        Greeting("Android")
+        //ProfileScreen()
     }
 }

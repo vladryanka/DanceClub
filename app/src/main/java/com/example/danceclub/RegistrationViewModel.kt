@@ -4,30 +4,19 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import com.example.danceclub.account.Account
+import com.example.danceclub.account.AccountsDao
+import com.example.danceclub.section.Section
+import com.example.danceclub.section.SectionDao
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class RegistrationViewModel(application: Application) : AndroidViewModel(application) {
     private val accountDao: AccountsDao = AppDatabase.getInstance(application).accountsDao()
-    private val sectionsDao: SectionDao =
-        AppDatabase.getInstance(application).sectionsDao()
+    private val sectionsDao: SectionDao = AppDatabase.getInstance(application).sectionsDao()
     private val appDatabase: AppDatabase = AppDatabase.getInstance(application)
-
-    fun getSections(): LiveData<List<Section>> {
-        return appDatabase.sectionsDao().getSections()
-    }
-
-    fun getAccounts(): LiveData<List<Account>> {
-        return appDatabase.accountsDao().getAccounts()
-    }
 
     fun findAccount(username: String): Account? {
         return accountDao.searchAccount(username)
     }
-
-    fun saveSection(section: Section) {
-        sectionsDao.add(section)
-    }
-
-
     fun saveAccount(account: Account) {
         Log.d("Doing", "Пришли в saveAccount")
         accountDao.add(account)
