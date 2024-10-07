@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -78,7 +76,7 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)
     implementation(libs.okhttp)
-    implementation (libs.accompanist.swiperefresh)
+    implementation(libs.accompanist.swiperefresh)
 
     implementation(libs.coil.compose)
 
