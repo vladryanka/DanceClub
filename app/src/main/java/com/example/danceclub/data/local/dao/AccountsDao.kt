@@ -1,9 +1,10 @@
-package com.example.danceclub.account
+package com.example.danceclub.data.local.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.example.danceclub.data.model.Account
 
 @Dao
 interface AccountsDao {

@@ -1,13 +1,12 @@
-package com.example.danceclub
+package com.example.danceclub.ui.screens.auth.sign_up
 
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import com.example.danceclub.account.Account
-import com.example.danceclub.account.AccountsDao
-import com.example.danceclub.section.Section
-import com.example.danceclub.section.SectionDao
+import com.example.danceclub.data.model.Account
+import com.example.danceclub.data.local.dao.AccountsDao
+import com.example.danceclub.data.local.AppDatabase
+import com.example.danceclub.data.local.dao.SectionDao
 
 class RegistrationViewModel(application: Application) : AndroidViewModel(application) {
     private val accountDao: AccountsDao = AppDatabase.getInstance(application).accountsDao()
@@ -17,10 +16,13 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
     fun findAccount(username: String): Account? {
         return accountDao.searchAccount(username)
     }
+
     fun saveAccount(account: Account) {
         Log.d("Doing", "Пришли в saveAccount")
         accountDao.add(account)
     }
+
+    // TODO:
     //не хватает функционала удаления записи на секцию у аккаунта
     //и связи между аккаунтом и секцией
 }

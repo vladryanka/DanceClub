@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -42,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
     packaging {
         resources {
@@ -53,35 +55,45 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+
+    //Lifecycle
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
-    val lifecycle_version = "2.7.0"
-
-    val room_version = "2.6.1"
-    //implementation(libs.androidx.room.ktx)
-    //annotationProcessor(libs.androidx.room.compiler)
-    //ksp(libs.androidx.room.compiler)
-
-
-
-    implementation("androidx.compose.material:material-icons-extended:1.0.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
-
-    implementation(libs.androidx.activity.compose)
+    //Compose
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("androidx.compose.material:material-icons-extended:1.7.2")
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.kotlinx.coroutines.android)
+
+    implementation(libs.kotlinx.serialization.json)
+
+    //Network
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.retrofit)
+    implementation(libs.okhttp)
+    implementation (libs.accompanist.swiperefresh)
+
+    implementation(libs.coil.compose)
+
+    //Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    //Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

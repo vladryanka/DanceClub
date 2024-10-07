@@ -1,4 +1,4 @@
-package com.example.danceclub.account
+package com.example.danceclub.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -9,8 +9,7 @@ data class Account(
     @PrimaryKey(autoGenerate = false)
     var username: String,
     @ColumnInfo(name = "password")
-    var password:String,
+    var password: String,
     @ColumnInfo(name = "name")
     var name: String
-
 )
