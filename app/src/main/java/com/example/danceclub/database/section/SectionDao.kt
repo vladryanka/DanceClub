@@ -1,4 +1,4 @@
-package com.example.danceclub.section
+package com.example.danceclub.database.section
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao

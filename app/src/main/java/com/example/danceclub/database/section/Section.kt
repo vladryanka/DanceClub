@@ -1,4 +1,4 @@
-package com.example.danceclub.section
+package com.example.danceclub.database.section
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -72,7 +71,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.danceclub.account.Account
+import com.example.danceclub.database.account.Account
+import com.example.danceclub.viewModel.AuthorizationViewModel
+import com.example.danceclub.viewModel.RegistrationViewModel
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
