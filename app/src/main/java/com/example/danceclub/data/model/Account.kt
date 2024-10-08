@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:app/src/main/java/com/example/danceclub/data/model/Account.kt
 package com.example.danceclub.data.model
+========
+package com.example.danceclub.database.account
+>>>>>>>> master:app/src/main/java/com/example/danceclub/database/account/Account.kt
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:app/src/main/java/com/example/danceclub/data/local/dao/SectionDao.kt
 package com.example.danceclub.data.local.dao
+========
+package com.example.danceclub.database.section
+>>>>>>>> master:app/src/main/java/com/example/danceclub/database/section/SectionDao.kt
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
