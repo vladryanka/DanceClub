@@ -1,10 +1,14 @@
 package com.example.danceclub.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.danceclub.data.model.Section
+import com.example.danceclub.ui.navigation.DetailDestination
 import com.example.danceclub.ui.navigation.GreetingDestination
 import com.example.danceclub.ui.navigation.ProfileDestination
 import com.example.danceclub.ui.navigation.RegistrationDestination
@@ -15,7 +19,10 @@ import com.example.danceclub.ui.screens.auth.sing_in.SignInScreen
 import com.example.danceclub.ui.screens.greeting.GreetingScreen
 import com.example.danceclub.ui.screens.profile.ProfileScreen
 import com.example.danceclub.ui.screens.trainings.TrainingsScreen
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DanceAppNavHost(
     navController: NavHostController = rememberNavController(),
@@ -79,12 +86,16 @@ fun DanceAppNavHost(
         }
         composable<TrainingsDestination> {
             TrainingsScreen(
-                onNavigateUpToProfile = {
+                onNavigateToProfile = {
                     navController.navigate(route = ProfileDestination) {
                         popUpTo<ProfileDestination> {
                             inclusive = true
                         }
                     }
+                },
+                onNavigateToDetail = { section: Section ->
+                    val sectionJson = Json.encodeToString(section)
+                    navController.navigate(route = "detail/$sectionJson")
                 }
             )
         }

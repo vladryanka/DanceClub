@@ -1,6 +1,6 @@
 [versions]
 accompanistSwiperefresh = "0.35.1-alpha"
-agp = "8.6.1"
+agp = "8.7.0"
 kotlin = "1.9.24"
 coreKtx = "1.13.1"
 ksp = "1.9.24-1.0.20"
@@ -26,6 +26,7 @@ retrofit = "2.9.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 
 coilCompose = "2.4.0"
+coreI18n = "1.0.0-alpha01"
 
 [libraries]
 #Core
@@ -74,6 +75,7 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-core-i18n = { group = "androidx.core", name = "core-i18n", version.ref = "coreI18n" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
