@@ -12,4 +12,7 @@
     <string name="authorization">Авторизация</string>
     <string name="enter_the_username">Введите @username\n</string>
     <string name="enter_the_password">Введите пароль</string>
+    <string name="location">Санкт-Петебрург, Кронверский пр. дом 49</string>
+    <string name="logo">Логотип танцевальной студии</string>
+    <string name="icon_check">галочка\n</string>
 </resources>

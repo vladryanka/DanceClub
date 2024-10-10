@@ -48,6 +48,7 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+
     }
 }
 
@@ -57,6 +58,8 @@ dependencies {
     //Lifecycle
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+
 
     //Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -83,6 +86,7 @@ dependencies {
     //Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.core.i18n)
     ksp(libs.androidx.room.compiler)
 
     //Test

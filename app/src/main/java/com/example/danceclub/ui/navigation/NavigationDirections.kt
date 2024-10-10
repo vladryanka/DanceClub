@@ -16,3 +16,6 @@ object ProfileDestination
 
 @Serializable
 object TrainingsDestination
+
+@Serializable
+object DetailDestination

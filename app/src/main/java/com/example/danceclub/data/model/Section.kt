@@ -3,15 +3,27 @@ package com.example.danceclub.data.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.LocalDate
+import java.time.LocalTime
 
 @Entity(tableName = "sections")
 data class Section(
     @PrimaryKey(autoGenerate = true)
-    var id: Int,
+    val id: Int,
     @ColumnInfo(name = "info")
-    var info: String,
+    val info: String,
     @ColumnInfo(name = "name")
-    var name: String,
+    val name: String,
     @ColumnInfo(name = "isFree")
-    var isFree: Boolean
+    val isFree: Boolean,
+    @ColumnInfo(name = "teacher")
+    val teacher: String,
+    @ColumnInfo(name = "price")
+    val price: Int,
+    @ColumnInfo(name = "time")
+    val time: LocalTime,
+    @ColumnInfo(name = "date")
+    val date: LocalDate,
+    @ColumnInfo(name = "class_space")
+    val space:Int
 )

@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "accounts")
 data class Account(
     @PrimaryKey(autoGenerate = false)
-    var username: String,
+    val username: String,
     @ColumnInfo(name = "password")
-    var password: String,
+    val password: String,
     @ColumnInfo(name = "name")
-    var name: String
+    val name: String
 )
