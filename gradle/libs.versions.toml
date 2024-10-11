@@ -22,11 +22,10 @@ kotlinxSerialization = "1.6.3"
 room = "2.6.1"
 
 okhttp = "4.11.0"
-retrofit = "2.9.0"
+retrofit = "2.11.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 
 coilCompose = "2.4.0"
-coreI18n = "1.0.0-alpha01"
 
 [libraries]
 #Core
@@ -37,7 +36,6 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 
 #Lifecycle
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
-androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 
 #Compose
@@ -75,7 +73,6 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-core-i18n = { group = "androidx.core", name = "core-i18n", version.ref = "coreI18n" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
