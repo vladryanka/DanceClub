@@ -94,7 +94,7 @@ fun RegistrationScreen(
                         modifier = Modifier.fillMaxWidth(1f)
                     ) {
                         Image(
-                            painter = painterResource(R.drawable.backnew_image),
+                            painter = painterResource(R.drawable.arrow_back),
                             contentDescription = stringResource(
                                 R.string.back
                             ), modifier = Modifier
@@ -262,8 +262,8 @@ fun RegistrationScreen(
                                         )
                                     )
                                     withContext(Dispatchers.Main) {
-//                                        onNavigateToProfile()
-                                        onNavigateUpToGreeting()
+                                        onNavigateToProfile()
+
                                     }
                                 }
 
