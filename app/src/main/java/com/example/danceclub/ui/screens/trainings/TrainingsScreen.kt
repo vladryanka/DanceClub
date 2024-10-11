@@ -37,8 +37,8 @@ import java.time.LocalTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrainingsScreen(
-    onNavigateToProfile: () -> Unit,
-    onNavigateUpToDetail: (Section) -> Unit
+    onNavigateUpToProfile: () -> Unit,
+    onNavigateToDetail: (Section) -> Unit
 ) {
     val isItem1Visible = remember { mutableStateOf(true) }
     Scaffold(
@@ -58,7 +58,7 @@ fun TrainingsScreen(
                             modifier = Modifier
                                 .size(32.dp)
                                 .clickable {
-                                    onNavigateToProfile()
+                                    onNavigateUpToProfile()
                                 }
                         )
                         Image(
@@ -99,7 +99,7 @@ fun TrainingsScreen(
             )
 
             false -> TrainingCardsScreen(
-                contentPadding, onNavigateUpToDetail
+                contentPadding, onNavigateToDetail
             )
         }
 
@@ -112,8 +112,8 @@ fun ProfileScreenPreview() {
     DanceClubTheme {
         Surface {
             TrainingsScreen(
-                onNavigateToProfile = {},
-                onNavigateUpToDetail = {},
+                onNavigateUpToProfile = {},
+                onNavigateToDetail = {},
             )
         }
     }

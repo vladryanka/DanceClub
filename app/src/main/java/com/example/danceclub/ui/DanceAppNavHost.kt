@@ -82,14 +82,14 @@ fun DanceAppNavHost(
         }
         composable<TrainingsDestination> {
             TrainingsScreen(
-                onNavigateToProfile = {
+                onNavigateUpToProfile = {
                     navController.navigate(route = ProfileDestination) {
                         popUpTo<ProfileDestination> {
                             inclusive = true
                         }
                     }
                 },
-                onNavigateUpToDetail = { section: Section ->
+                onNavigateToDetail = { section: Section ->
                     val sectionJson = Json.encodeToString(section)
                     navController.navigate(route = "detail/$sectionJson")
                 }
