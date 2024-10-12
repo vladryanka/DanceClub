@@ -47,4 +47,4 @@
   - @vladryanka - Android-developer
 - Server (Python)
   - @vovanshil95 - Backend-developer
-  - @P0linaria - Bocumentarian & Backend-developer
+  - @P0linaria - Documentarian & Backend-developer
