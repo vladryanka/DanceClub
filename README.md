@@ -39,12 +39,12 @@
 - Jetpack Compose
 
 ## Deploy и CI/CD
-После каждого commit или подтверждённого pull request в мастер ветку GitHub автоматически соберет APK, который будет находиться в [артифактах GitHub Actions](actions/artifacts).
+После каждого commit или подтверждённого pull request в мастер ветку GitHub автоматически соберет APK, который будет находиться в артефактах GitHub Actions.
 
 ## Команда проекта
 - Android
-  - @trombbone - Team Lead & Android-developer
+  - @TrombBone - Team Lead & Android-developer
   - @vladryanka - Android-developer
 - Server (Python)
   - @vovanshil95 - Backend-developer
-  - @P0linaria - Bocumentarian & Backend-developer
+  - @P0linaria - Documentarian & Backend-developer
