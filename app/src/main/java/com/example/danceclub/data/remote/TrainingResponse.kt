@@ -10,8 +10,4 @@ data class TrainingResponse(
     val message: String? = null,
     @SerialName("trainings")
     val trainings: List<Training>? = null
-) {
-    fun getTrainings(): List<Training>? {
-        return trainings
-    }
-}
+)

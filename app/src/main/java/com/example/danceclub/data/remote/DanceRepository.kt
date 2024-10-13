@@ -14,7 +14,7 @@ class DanceRepository (private val personDao: PersonsDao, private val trainingDa
             }
         }
         val trainingResponse = apiService.loadTrainingsResponse()
-        for (training in trainingResponse.getTrainings()!!){
+        for (training in trainingResponse.trainings!!){
                 trainingDao.add(training)//тут нужна какая-то проверка на повторы??
         }
     }
