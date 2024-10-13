@@ -6,7 +6,9 @@
     <string name="back">Назад</string>
     <string name="usernameID">\@имя_пользователя\n</string>
     <string name="username">ФИО</string>
+    <string name="age">Возраст</string>
     <string name="password">Пароль</string>
+    <string name="phone">Телефон</string>
     <string name="reenter_the_password">Повторите пароль</string>
     <string name="save">Сохранить</string>
     <string name="authorization">Авторизация</string>

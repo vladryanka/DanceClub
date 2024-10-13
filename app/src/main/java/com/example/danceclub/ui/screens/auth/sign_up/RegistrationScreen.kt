@@ -50,13 +50,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.danceclub.R
-import com.example.danceclub.data.model.Account
+import com.example.danceclub.data.model.Person
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,8 +67,9 @@ fun RegistrationScreen(
     onNavigateUpToGreeting: () -> Unit,
 ) {
 
-    var textStateUsername by remember { mutableStateOf(TextFieldValue()) }
     var textStateName by remember { mutableStateOf(TextFieldValue()) }
+    var textStateAge by remember { mutableStateOf(TextFieldValue()) }
+    var textStatePhone by remember { mutableStateOf(TextFieldValue()) }
     var textStatePassword by remember { mutableStateOf(TextFieldValue()) }
     var textStateReenterPassword by remember { mutableStateOf(TextFieldValue()) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -76,10 +78,11 @@ fun RegistrationScreen(
 
     val scope = rememberCoroutineScope()
 
-    var username by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var reenteredPassword by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -124,23 +127,6 @@ fun RegistrationScreen(
         ) {
 
             TextField(
-                value = textStateUsername,
-                onValueChange = {
-                    textStateUsername = it
-                    username = it.text.trim()
-                },
-                label = {
-                    Text(
-                        stringResource(id = R.string.usernameID),
-                        color = Color.Black
-                    )
-                },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
-                modifier = Modifier.padding(8.dp)
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-
-            TextField(
                 value = textStateName,
                 onValueChange = {
                     textStateName = it
@@ -155,6 +141,44 @@ fun RegistrationScreen(
                 modifier = Modifier.padding(8.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     capitalization = KeyboardCapitalization.Words
+                )
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            TextField(
+                value = textStateAge,
+                onValueChange = {
+                    textStateAge = it
+                    age = it.text.trim()
+                },
+                label = {
+                    Text(
+                        stringResource(id = R.string.age),
+                        color = Color.Black
+                    )
+                },
+                modifier = Modifier.padding(8.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number
+                )
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            TextField(
+                value = textStatePhone,
+                onValueChange = {
+                    textStatePhone = it
+                    phone = it.text.trim()
+                },
+                label = {
+                    Text(
+                        stringResource(id = R.string.phone),
+                        color = Color.Black
+                    )
+                },
+                modifier = Modifier.padding(8.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Phone,
+                    capitalization = KeyboardCapitalization.None // Можно установить в None для ввода номера телефона
                 )
             )
             Spacer(modifier = Modifier.height(20.dp))
@@ -226,9 +250,7 @@ fun RegistrationScreen(
             Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = {
-                    if (username == "" || name == ""
-                        || password == "" || reenteredPassword == ""
-                    ) {
+                    if (name == "" || password == "" || reenteredPassword == "") {
                         scope.launch {
                             snackbarHostState.showSnackbar(
                                 "Заполните все поля",
@@ -247,7 +269,7 @@ fun RegistrationScreen(
                             }
                         else {
                             CoroutineScope(Dispatchers.IO).launch {
-                                if (registrationViewModel.findAccount(username) != null) {
+                                if (registrationViewModel.findPerson(name) != null) {
                                     scope.launch {
                                         snackbarHostState.showSnackbar(
                                             "Такой аккаунт уже существует",
@@ -256,14 +278,23 @@ fun RegistrationScreen(
                                         )
                                     }
                                 } else {
-                                    registrationViewModel.saveAccount(
-                                        Account(
-                                            username, password, name
+                                    val nameList = name.split(" ").toMutableList()
+                                    if (nameList.size == 2)
+                                    {
+                                        nameList.add(" ")
+                                    }
+                                    registrationViewModel.savePerson(
+                                        Person(
+                                            id = Random.nextInt(0,10000).toString(),
+                                            name = nameList[1],
+                                            surname = nameList[0],
+                                            patronimic = nameList[2],
+                                            age = age.toInt(),
+                                            phone = phone
                                         )
                                     )
                                     withContext(Dispatchers.Main) {
                                         onNavigateToProfile()
-
                                     }
                                 }
 

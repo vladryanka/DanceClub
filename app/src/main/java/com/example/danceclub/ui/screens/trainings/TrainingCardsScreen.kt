@@ -44,7 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.danceclub.R
-import com.example.danceclub.data.model.Section
+import com.example.danceclub.data.model.Training
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -53,7 +53,7 @@ import java.time.LocalTime
 @Composable
 fun TrainingCardsScreen(
     contentPadding: PaddingValues,
-    onNavigateToDetail: (Section) -> Unit
+    onNavigateToDetail: (Training) -> Unit
 ) {
     val months = listOf(
         "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
@@ -63,13 +63,13 @@ fun TrainingCardsScreen(
     var selectedMonth by remember { mutableStateOf(months[0]) }
     val isChecked: Boolean by remember { mutableStateOf(false) }
     val trainingList = listOf(
-        Section(1,"Pole sport","Streching (Растяжка)",true,
+        Training(1,"Pole sport","Streching (Растяжка)",true,
             "Настя", 1500,  LocalTime.of(15,30),
             LocalDate.of(2024, 10, 9), 10 ),
-        Section(2,"Dance sport","Zumba",true,"Яна",
+        Training(2,"Dance sport","Zumba",true,"Яна",
             700, LocalTime.of(11,30),
             LocalDate.of(2024, 10, 13),10),
-        Section(3,"Hole dance sport","Hole dance",true,
+        Training(3,"Hole dance sport","Hole dance",true,
             "Маша", 1000,  LocalTime.of(10,0),
             LocalDate.of(2024, 10, 20), 10)
     )

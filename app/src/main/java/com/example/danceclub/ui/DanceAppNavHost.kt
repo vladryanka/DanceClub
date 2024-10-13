@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.danceclub.data.model.Section
+import com.example.danceclub.data.model.Training
 import com.example.danceclub.ui.navigation.GreetingDestination
 import com.example.danceclub.ui.navigation.ProfileDestination
 import com.example.danceclub.ui.navigation.RegistrationDestination
@@ -89,7 +89,7 @@ fun DanceAppNavHost(
                         }
                     }
                 },
-                onNavigateToDetail = { section: Section ->
+                onNavigateToDetail = { section: Training ->
                     val sectionJson = Json.encodeToString(section)
                     navController.navigate(route = "detail/$sectionJson")
                 }

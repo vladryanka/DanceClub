@@ -19,12 +19,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.danceclub.R
-import com.example.danceclub.data.model.Section
+import com.example.danceclub.data.model.Training
 
 @Composable
 fun DetailScreen(
     contentPadding: PaddingValues,
-    item: Section
+    item: Training
 ){
     Column(modifier = Modifier
         .padding(top = contentPadding.calculateTopPadding(), start = 16.dp)){

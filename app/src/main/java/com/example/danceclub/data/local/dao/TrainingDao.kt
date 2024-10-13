@@ -4,16 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.danceclub.data.model.Section
+import com.example.danceclub.data.model.Training
 
 @Dao
-interface SectionDao {
+interface TrainingDao {
 
-    @Query("SELECT * FROM sections")
-    fun getSections(): LiveData<List<Section>>
+    @Query("SELECT * FROM training")
+    fun getTrainings(): LiveData<List<Training>>
 
     @Insert
-    fun add(section: Section)
+    fun add(training: Training)
 
     // TODO: тут не все, что умеет делать секция
 }

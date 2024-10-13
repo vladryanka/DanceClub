@@ -28,7 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.danceclub.R
-import com.example.danceclub.data.model.Section
+import com.example.danceclub.data.model.Training
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
 import java.time.LocalDate
@@ -38,9 +38,9 @@ import java.time.LocalTime
 @Composable
 fun TrainingsScreen(
     onNavigateUpToProfile: () -> Unit,
-    onNavigateToDetail: (Section) -> Unit
+    onNavigateToDetail: (Training) -> Unit
 ) {
-    val isItem1Visible = remember { mutableStateOf(true) }
+    val isItem1Visible = remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -93,9 +93,8 @@ fun TrainingsScreen(
 
         when (isItem1Visible.value) {
             true -> DetailScreen(
-                contentPadding, Section(2,"Dance sport","Zumba",true,"Яна",
-                    700, LocalTime.of(11,30),
-                    LocalDate.of(2024, 10, 13),10)
+                contentPadding, Training("10","Dancing","kdkdk",LocalDate.of(2024, 10, 13),
+                    true,10,9)
             )
 
             false -> TrainingCardsScreen(
