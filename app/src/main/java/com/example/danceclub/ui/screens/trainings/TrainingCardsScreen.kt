@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.sp
 import com.example.danceclub.R
 import com.example.danceclub.data.model.Training
 import java.time.LocalDate
-import java.time.LocalTime
 
 @SuppressLint("NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,17 +61,9 @@ fun TrainingCardsScreen(
     var expanded by remember { mutableStateOf(false) }
     var selectedMonth by remember { mutableStateOf(months[0]) }
     val isChecked: Boolean by remember { mutableStateOf(false) }
-    val trainingList = listOf(
-        Training(1,"Pole sport","Streching (Растяжка)",true,
-            "Настя", 1500,  LocalTime.of(15,30),
-            LocalDate.of(2024, 10, 9), 10 ),
-        Training(2,"Dance sport","Zumba",true,"Яна",
-            700, LocalTime.of(11,30),
-            LocalDate.of(2024, 10, 13),10),
-        Training(3,"Hole dance sport","Hole dance",true,
-            "Маша", 1000,  LocalTime.of(10,0),
-            LocalDate.of(2024, 10, 20), 10)
-    )
+    val trainingList = listOf(Training(22,"name","description",
+        LocalDate.of(2024,4,2),
+            true,9,10))
     Column(
         modifier = Modifier
             .padding(top = contentPadding.calculateTopPadding()),
@@ -145,7 +136,8 @@ fun TrainingCardsScreen(
                         )
                         Column {
                             Text(
-                                text = item.teacher,
+                                text = "gfd",
+                                //text = item.teacher,
                                 color = Color.Black,
                                 maxLines = 1,
                                 modifier = Modifier.fillMaxWidth(),
@@ -153,7 +145,7 @@ fun TrainingCardsScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = item.info,
+                                text = "gfd",//text = item.info,
                                 color = Color.Gray,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -162,7 +154,7 @@ fun TrainingCardsScreen(
                         }
                     }
                     Text(
-                        text = item.price.toString(),
+                        text = "gfd",//text = item.price.toString(),
                         color = Color.Gray,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,

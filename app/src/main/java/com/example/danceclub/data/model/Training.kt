@@ -11,9 +11,9 @@ import java.time.LocalDate
 @Serializable
 data class Training(
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "id")
-    val id: String,
+    val id: Long,// в JSON String
 
     @ColumnInfo(name = "name")
     val name:String,

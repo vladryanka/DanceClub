@@ -31,8 +31,6 @@ import com.example.danceclub.R
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
-import java.time.LocalDate
-import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,8 +88,11 @@ fun TrainingsScreen(
             )
         }
     ) { contentPadding ->
+        TrainingCardsScreen(
+        contentPadding, onNavigateToDetail
+        )
 
-        when (isItem1Visible.value) {
+        /*when (isItem1Visible.value) {
             true -> DetailScreen(
                 contentPadding, Training("10","Dancing","kdkdk",LocalDate.of(2024, 10, 13),
                     true,10,9)
@@ -100,7 +101,7 @@ fun TrainingsScreen(
             false -> TrainingCardsScreen(
                 contentPadding, onNavigateToDetail
             )
-        }
+        }*/
 
     }
 }

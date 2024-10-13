@@ -66,7 +66,8 @@ fun DetailScreen(
                     style = TextStyle(fontSize = 24.sp)
                 )
                 Text(
-                    text = item.time.toString(),
+                    text = "fgdf",
+                    //text = item.time.toString(),
                     color = Color.Gray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -77,7 +78,8 @@ fun DetailScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text =  "${item.price} ₽",
+            text = "dfgdf",
+            //text =  "${item.price} ₽",
             color = Color.Black,
             maxLines = 1,
             modifier = Modifier.fillMaxWidth(),
@@ -92,7 +94,8 @@ fun DetailScreen(
             )
             Column {
                 Text(
-                    text = item.teacher,
+                    text = "dfgdf",
+                    //text = item.teacher,
                     color = Color.Black,
                     maxLines = 1,
                     modifier = Modifier.fillMaxWidth(),
@@ -101,7 +104,8 @@ fun DetailScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = item.info,
+                    text = "dfgdf",
+                    //text = item.info,
                     color = Color.Gray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

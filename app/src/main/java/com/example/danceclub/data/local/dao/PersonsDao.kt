@@ -15,7 +15,10 @@ interface PersonsDao {
     @Insert
     fun add(person: Person)
 
-    @Query("SELECT * FROM persons WHERE id LIKE :searchQuery")
-    fun searchPerson(searchQuery: String): Person?
+    @Query("SELECT * FROM persons WHERE phone LIKE :phone")
+    fun searchPerson(phone: String): Person?
+
+    @Query("SELECT * FROM persons WHERE phone LIKE :phone")
+    fun containsPerson(phone: String): Boolean
 
 }

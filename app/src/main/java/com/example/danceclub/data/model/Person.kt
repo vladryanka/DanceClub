@@ -8,9 +8,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Entity(tableName = "persons")
 data class Person(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "id")
-    val id: String,
+    val id: Long, // If a primary key is annotated with autoGenerate, its type must be int, Integer, long or Long.
+    // в JSON оно String
     @ColumnInfo(name = "name")
     val name: String,
     @ColumnInfo(name = "surname")

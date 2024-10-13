@@ -25,14 +25,21 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.danceclub.R
+import com.example.danceclub.data.model.Person
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
 
 @Composable
 fun ProfileScreen(
+    profileViewModel: ProfileViewModel = viewModel(),
     onNavigateToTrainings: () -> Unit,
 ) {
+    var person: Person
+    /*LaunchedEffect {
+        person = profileViewModel.getPersonWithPhone(phone)
+    }*/
     Column(
         modifier = Modifier
             .fillMaxSize()

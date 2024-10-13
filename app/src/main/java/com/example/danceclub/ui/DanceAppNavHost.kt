@@ -5,19 +5,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.danceclub.data.model.Training
 import com.example.danceclub.ui.navigation.GreetingDestination
 import com.example.danceclub.ui.navigation.ProfileDestination
 import com.example.danceclub.ui.navigation.RegistrationDestination
 import com.example.danceclub.ui.navigation.SignInDestination
-import com.example.danceclub.ui.navigation.TrainingsDestination
 import com.example.danceclub.ui.screens.auth.sign_up.RegistrationScreen
 import com.example.danceclub.ui.screens.auth.sing_in.SignInScreen
 import com.example.danceclub.ui.screens.greeting.GreetingScreen
-import com.example.danceclub.ui.screens.profile.ProfileScreen
-import com.example.danceclub.ui.screens.trainings.TrainingsScreen
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @Composable
 fun DanceAppNavHost(
@@ -57,7 +51,7 @@ fun DanceAppNavHost(
         }
         composable<RegistrationDestination> {
             RegistrationScreen(
-                onNavigateToProfile = {
+                onNavigateToProfile = { // добавить передачу параметра phone
                     navController.navigate(route = ProfileDestination) {
                         popUpTo<ProfileDestination> {
                             inclusive = true
@@ -73,7 +67,7 @@ fun DanceAppNavHost(
                 }
             )
         }
-        composable<ProfileDestination> {
+       /* composable<ProfileDestination> {
             ProfileScreen(
                 onNavigateToTrainings = {
                     navController.navigate(route = TrainingsDestination)
@@ -94,6 +88,6 @@ fun DanceAppNavHost(
                     navController.navigate(route = "detail/$sectionJson")
                 }
             )
-        }
+        }*/
     }
 }

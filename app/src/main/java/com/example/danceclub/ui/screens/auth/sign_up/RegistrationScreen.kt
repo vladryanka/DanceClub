@@ -29,6 +29,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,7 +67,12 @@ fun RegistrationScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateUpToGreeting: () -> Unit,
 ) {
+    var personList:List<Person>? = emptyList()
 
+    LaunchedEffect(Unit) {
+        registrationViewModel.fetchAndStorePersons()
+        personList = registrationViewModel.getPersons().value
+    }
     var textStateName by remember { mutableStateOf(TextFieldValue()) }
     var textStateAge by remember { mutableStateOf(TextFieldValue()) }
     var textStatePhone by remember { mutableStateOf(TextFieldValue()) }
@@ -269,15 +275,9 @@ fun RegistrationScreen(
                             }
                         else {
                             CoroutineScope(Dispatchers.IO).launch {
-                                if (registrationViewModel.findPerson(name) != null) {
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar(
-                                            "Такой аккаунт уже существует",
-                                            withDismissAction = true,
-                                            duration = SnackbarDuration.Short
-                                        )
-                                    }
-                                } else {
+                                val containsPerson = personList?.any { it.phone == phone }
+
+                                if (containsPerson == false) {
                                     val nameList = name.split(" ").toMutableList()
                                     if (nameList.size == 2)
                                     {
@@ -285,7 +285,7 @@ fun RegistrationScreen(
                                     }
                                     registrationViewModel.savePerson(
                                         Person(
-                                            id = Random.nextInt(0,10000).toString(),
+                                            id = Random.nextInt(0,10000).toLong(),
                                             name = nameList[1],
                                             surname = nameList[0],
                                             patronimic = nameList[2],
@@ -296,8 +296,15 @@ fun RegistrationScreen(
                                     withContext(Dispatchers.Main) {
                                         onNavigateToProfile()
                                     }
+                                } else {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            "Такой аккаунт уже существует",
+                                            withDismissAction = true,
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
                                 }
-
                             }
                         }
                     }

@@ -12,9 +12,10 @@ import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.data.local.converters.Converters
 import com.example.danceclub.data.local.dao.TrainingSignDao
+import com.example.danceclub.data.model.TrainingSign
 
 @Database(
-    entities = [Person::class, Training::class],
+    entities = [Person::class, Training::class, TrainingSign::class],
     version = DATABASE_VERSION
 )
 @TypeConverters(Converters::class)

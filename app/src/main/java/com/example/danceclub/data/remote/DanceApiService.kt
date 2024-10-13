@@ -1,6 +1,5 @@
 package com.example.danceclub.data.remote
 
-import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -22,7 +21,7 @@ interface DanceApiService {
     suspend fun loadTrainingsResponse(): TrainingResponse
 
     @GET("training/ по id") // TODO
-    suspend fun loadSelectedTrainingResponse(): Training
+    suspend fun loadSelectedTrainingResponse(id:String): Training
 
     @GET("training/signed")
     suspend fun loadSignedTrainingResponse(): Training
