@@ -1,5 +1,6 @@
 package com.example.danceclub.ui.screens.trainings
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,27 +20,33 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.danceclub.R
-import com.example.danceclub.data.model.Section
+import com.example.danceclub.data.model.Training
 
 @Composable
-fun DetailScreen(
+fun DetailItem(
     contentPadding: PaddingValues,
-    item: Section
-){
-    Column(modifier = Modifier
-        .padding(top = contentPadding.calculateTopPadding(), start = 16.dp)){
+    training: Training,
+    changeVisibility: () -> Unit
+) {
+    BackHandler { changeVisibility() }
+    Column(
+        modifier = Modifier
+            .padding(top = contentPadding.calculateTopPadding(), start = 16.dp)
+    ) {
 
         Text(
-            text = item.name,
+            text = training.name,
             color = Color.Black,
             maxLines = 1,
             modifier = Modifier.fillMaxWidth(),
             style = TextStyle(fontSize = 24.sp)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Row(modifier = Modifier.fillMaxWidth()){
-            Column(modifier = Modifier
-                .weight(1f) ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
                 Text(
                     text = "Дата",
                     color = Color.Black,
@@ -48,7 +55,7 @@ fun DetailScreen(
                     style = TextStyle(fontSize = 24.sp)
                 )
                 Text(
-                    text = item.date.toString(),
+                    text = training.date.toString(),
                     color = Color.Gray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -56,8 +63,10 @@ fun DetailScreen(
                 )
 
             }
-            Column(modifier = Modifier
-                .weight(1f) ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
                 Text(
                     text = "Время",
                     color = Color.Black,
@@ -66,7 +75,8 @@ fun DetailScreen(
                     style = TextStyle(fontSize = 24.sp)
                 )
                 Text(
-                    text = item.time.toString(),
+                    text = "fgdf",
+                    //text = item.time.toString(),
                     color = Color.Gray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -77,14 +87,15 @@ fun DetailScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text =  "${item.price} ₽",
+            text = "dfgdf",
+            //text =  "${item.price} ₽",
             color = Color.Black,
             maxLines = 1,
             modifier = Modifier.fillMaxWidth(),
             style = TextStyle(fontSize = 24.sp)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Row{
+        Row {
             Image(
                 painter = painterResource(R.drawable.profile_image), // rememberAsyncImagePainter(image)
                 contentDescription = null,
@@ -92,7 +103,8 @@ fun DetailScreen(
             )
             Column {
                 Text(
-                    text = item.teacher,
+                    text = "dfgdf",
+                    //text = item.teacher,
                     color = Color.Black,
                     maxLines = 1,
                     modifier = Modifier.fillMaxWidth(),
@@ -101,7 +113,8 @@ fun DetailScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = item.info,
+                    text = "dfgdf",
+                    //text = item.info,
                     color = Color.Gray,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

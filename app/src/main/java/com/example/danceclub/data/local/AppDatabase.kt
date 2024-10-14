@@ -6,21 +6,25 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.danceclub.data.local.AppDatabase.Companion.DATABASE_VERSION
-import com.example.danceclub.data.local.dao.AccountsDao
-import com.example.danceclub.data.local.dao.SectionDao
-import com.example.danceclub.data.model.Account
-import com.example.danceclub.data.model.Section
+import com.example.danceclub.data.local.dao.PersonsDao
+import com.example.danceclub.data.local.dao.TrainingDao
+import com.example.danceclub.data.model.Person
+import com.example.danceclub.data.model.Training
 import com.example.danceclub.data.local.converters.Converters
+import com.example.danceclub.data.local.dao.TrainingSignDao
+import com.example.danceclub.data.model.TrainingSign
 
 @Database(
-    entities = [Account::class, Section::class],
+    entities = [Person::class, Training::class, TrainingSign::class],
     version = DATABASE_VERSION
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun accountsDao(): AccountsDao
-    abstract fun sectionsDao(): SectionDao
+    abstract fun personsDao(): PersonsDao
+    abstract fun trainingsDao(): TrainingDao
+    abstract fun trainingSignsDao(): TrainingSignDao
+
 
     companion object {
 

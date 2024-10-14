@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.danceclub.R
+import com.example.danceclub.data.model.Person
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
 import kotlinx.coroutines.CoroutineScope
@@ -59,13 +61,13 @@ import kotlinx.coroutines.withContext
 @Composable
 fun SignInScreen(
     authorizationViewModel: SignInViewModel = viewModel(),
-    onNavigateToProfile: () -> Unit,
+    onNavigateToProfile: (Person) -> Unit,
     onNavigateUpToGreeting: () -> Unit,
 ) {
 
-    var textStateUsername by remember { mutableStateOf(TextFieldValue()) }
+    var textStatePhone by remember { mutableStateOf(TextFieldValue()) }
     var textStatePassword by remember { mutableStateOf(TextFieldValue()) }
-    var username by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -113,18 +115,22 @@ fun SignInScreen(
         ) {
 
             TextField(
-                value = textStateUsername,
+                value = textStatePhone,
                 onValueChange = {
-                    textStateUsername = it
-                    username = it.text.trim()
+                    textStatePhone = it
+                    phone = it.text.trim()
                 },
                 label = {
                     Text(
-                        stringResource(id = R.string.enter_the_username),
+                        stringResource(id = R.string.enter_the_phone),
                         color = Color.Black
                     )
                 },
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Phone,
+                    capitalization = KeyboardCapitalization.None // Можно установить в None для ввода номера телефона
+                )
             )
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -164,18 +170,18 @@ fun SignInScreen(
             Button(
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
-                        val account = authorizationViewModel.findAccount(username)
+                        val person = authorizationViewModel.findPerson(phone)
 
-                        if (account == null) {
+                        if (person == null) {
                             withContext(Dispatchers.Main) {
                                 snackbarHostState.showSnackbar(
-                                    "Введен некорректный username",
+                                    "Введен некорректный телефон",
                                     withDismissAction = true,
                                     duration = SnackbarDuration.Short
                                 )
                             }
-                        } else {
-                            if (account.password != password) {
+                        } else {/*
+                           if (person.password != password) {
                                 withContext(Dispatchers.Main) {
                                     snackbarHostState.showSnackbar(
                                         "Введен некорректный пароль",
@@ -183,9 +189,11 @@ fun SignInScreen(
                                         duration = SnackbarDuration.Short
                                     )
                                 }
-                            } else {
-                                onNavigateToProfile()
+                            } else {*/
+                            withContext(Dispatchers.Main) {
+                                onNavigateToProfile(person)
                             }
+                            //}
                         }
                     }
                 },

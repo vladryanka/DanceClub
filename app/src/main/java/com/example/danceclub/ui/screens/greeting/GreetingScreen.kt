@@ -28,9 +28,6 @@ import com.example.danceclub.R
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
 
-/**
- * Экран "Добро пожаловать"
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GreetingScreen(

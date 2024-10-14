@@ -83,6 +83,10 @@ dependencies {
     //Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.core.i18n)
+    implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.androidx.media3.decoder)
+    implementation(libs.androidx.runtime.livedata)
     ksp(libs.androidx.room.compiler)
 
     //Test

@@ -2,33 +2,15 @@ package com.example.danceclub.ui.screens.auth.sing_in
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.example.danceclub.data.model.Account
-import com.example.danceclub.data.local.dao.AccountsDao
+import com.example.danceclub.data.model.Person
+import com.example.danceclub.data.local.dao.PersonsDao
 import com.example.danceclub.data.local.AppDatabase
-import com.example.danceclub.data.local.dao.SectionDao
 
 class SignInViewModel(application: Application) : AndroidViewModel(application) {
-    private val accountDao: AccountsDao = AppDatabase.getInstance(application).accountsDao()
-    private val sectionsDao: SectionDao = AppDatabase.getInstance(application).sectionsDao()
-    private val appDatabase: AppDatabase = AppDatabase.getInstance(application)
-//    private val apiFactory: ApiFactory = ApiFactory()
+    private val personDao: PersonsDao = AppDatabase.getInstance(application).personsDao()
 
-    fun findAccount(username: String): Account? {
-        return accountDao.searchAccount(username)
+    fun findPerson(phone: String): Person? {
+        return personDao.searchPerson(phone)
     }
-
-    /*fun getSections(): LiveData<List<Section>> {
-        return appDatabase.sectionsDao().getSections()
-    }
-
-    fun getAccounts(): LiveData<List<Account>> {
-        return appDatabase.accountsDao().getAccounts()
-    }
-
-    fun saveSection(section: Section) {
-        sectionsDao.add(section)
-    }
-
-     */
 
 }

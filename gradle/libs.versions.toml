@@ -26,6 +26,10 @@ retrofit = "2.11.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 
 coilCompose = "2.4.0"
+coreI18n = "1.0.0-alpha01"
+firebaseCrashlyticsBuildtools = "3.0.2"
+media3Decoder = "1.4.1"
+runtimeLivedata = "1.7.3"
 
 [libraries]
 #Core
@@ -73,6 +77,10 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-core-i18n = { group = "androidx.core", name = "core-i18n", version.ref = "coreI18n" }
+firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
+androidx-media3-decoder = { group = "androidx.media3", name = "media3-decoder", version.ref = "media3Decoder" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

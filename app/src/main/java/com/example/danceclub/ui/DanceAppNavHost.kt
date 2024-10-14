@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.danceclub.data.model.Section
+import com.example.danceclub.data.model.Person
 import com.example.danceclub.ui.navigation.GreetingDestination
 import com.example.danceclub.ui.navigation.ProfileDestination
 import com.example.danceclub.ui.navigation.RegistrationDestination
@@ -39,8 +39,10 @@ fun DanceAppNavHost(
         }
         composable<SignInDestination> {
             SignInScreen(
-                onNavigateToProfile = {
-                    navController.navigate(route = ProfileDestination) {
+                onNavigateToProfile = { person: Person ->
+                    val personJson = Json.encodeToString(person)
+                    navController.navigate(route = "$ProfileDestination/$personJson")
+                    {
                         popUpTo<ProfileDestination> {
                             inclusive = true
                         }
@@ -57,8 +59,10 @@ fun DanceAppNavHost(
         }
         composable<RegistrationDestination> {
             RegistrationScreen(
-                onNavigateToProfile = {
-                    navController.navigate(route = ProfileDestination) {
+                onNavigateToProfile = { person: Person ->
+                    val personJson = Json.encodeToString(person)
+                    navController.navigate(route = "$ProfileDestination/$personJson")
+                    {
                         popUpTo<ProfileDestination> {
                             inclusive = true
                         }
@@ -73,8 +77,12 @@ fun DanceAppNavHost(
                 }
             )
         }
-        composable<ProfileDestination> {
+        composable("$ProfileDestination/{personJson}") { backStackEntry ->
+            val personJson = backStackEntry.arguments?.getString("personJson")
+            val person =
+                Json.decodeFromString<Person>(personJson ?: "{}")
             ProfileScreen(
+                person = person,
                 onNavigateToTrainings = {
                     navController.navigate(route = TrainingsDestination)
                 }
@@ -88,11 +96,8 @@ fun DanceAppNavHost(
                             inclusive = true
                         }
                     }
-                },
-                onNavigateToDetail = { section: Section ->
-                    val sectionJson = Json.encodeToString(section)
-                    navController.navigate(route = "detail/$sectionJson")
                 }
+
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.example.danceclub.ui.screens.trainings
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -27,20 +28,24 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.danceclub.R
-import com.example.danceclub.data.model.Section
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
-import java.time.LocalDate
-import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrainingsScreen(
-    onNavigateUpToProfile: () -> Unit,
-    onNavigateToDetail: (Section) -> Unit
+    trainingScreenViewModel: TrainingScreenViewModel = viewModel(),
+    onNavigateUpToProfile: () -> Unit
 ) {
-    val isItem1Visible = remember { mutableStateOf(true) }
+
+    BackHandler { onNavigateUpToProfile() }
+    val isItem1Visible = remember { mutableStateOf(false) }
+    val trainingList = trainingScreenViewModel.trainings.value
+    fun changeVisibility() {
+        isItem1Visible.value = !isItem1Visible.value
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -91,19 +96,27 @@ fun TrainingsScreen(
         }
     ) { contentPadding ->
 
-        when (isItem1Visible.value) {
-            true -> DetailScreen(
-                contentPadding, Section(2,"Dance sport","Zumba",true,"Яна",
-                    700, LocalTime.of(11,30),
-                    LocalDate.of(2024, 10, 13),10)
-            )
 
-            false -> TrainingCardsScreen(
-                contentPadding, onNavigateToDetail
-            )
+        when (isItem1Visible.value) {
+            true -> {
+                val currentTraining = trainingScreenViewModel.currentTraining.value
+                if (currentTraining != null)
+                    DetailItem(
+                        contentPadding, currentTraining, ::changeVisibility
+                    )
+            }
+
+            false -> {
+                TrainingCardsItem(
+                    contentPadding,
+                    trainingList,
+                    trainingScreenViewModel::updateCurrentTrainings, ::changeVisibility
+                )
+            }
         }
 
     }
+
 }
 
 @PreviewLightDark
@@ -113,7 +126,6 @@ fun ProfileScreenPreview() {
         Surface {
             TrainingsScreen(
                 onNavigateUpToProfile = {},
-                onNavigateToDetail = {},
             )
         }
     }

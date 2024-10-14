@@ -26,17 +26,20 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.danceclub.R
+import com.example.danceclub.data.model.Person
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
 
 @Composable
 fun ProfileScreen(
+    person: Person,
     onNavigateToTrainings: () -> Unit,
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(start = 8.dp, top = 64.dp, end = 8.dp)
     ) {
         Row(
             modifier = Modifier
@@ -60,12 +63,12 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "ФИО",
-                    style = TextStyle(fontSize = 24.sp),
+                    text = "${person.surname} ${person.name} ${person.patronimic}",
+                    style = TextStyle(fontSize = 20.sp),
                     color = Color.Black
                 )
                 Text(
-                    text = "username",
+                    text = person.phone,
                     style = TextStyle(fontSize = 16.sp),
                     color = Color.Gray
                 )
@@ -95,9 +98,10 @@ fun ProfileScreen(
 fun ProfileScreenPreview() {
     DanceClubTheme {
         Surface {
-            ProfileScreen(
-                onNavigateToTrainings = {}
-            )
+            /*ProfileScreen(
+                onNavigateToTrainings = {},
+                person = TODO()
+            )*/
         }
     }
 }
