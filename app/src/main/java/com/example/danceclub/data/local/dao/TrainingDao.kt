@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 
 @Dao
@@ -11,6 +12,12 @@ interface TrainingDao {
 
     @Query("SELECT * FROM training")
     fun getTrainings(): LiveData<List<Training>>
+
+    @Query("SELECT * FROM training WHERE id = :id LIMIT 1")
+    fun getById(id: String): Training?
+
+    @Query("SELECT * FROM training")
+    suspend fun getTrainingsSync(): List<Training>
 
     @Insert
     fun add(training: Training)

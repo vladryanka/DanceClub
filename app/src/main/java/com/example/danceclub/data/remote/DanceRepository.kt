@@ -3,19 +3,31 @@ package com.example.danceclub.data.remote
 import com.example.danceclub.data.local.dao.PersonsDao
 import com.example.danceclub.data.local.dao.TrainingDao
 import com.example.danceclub.data.model.Training
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class DanceRepository (private val personDao: PersonsDao, private val trainingDao: TrainingDao) {
+class DanceRepository(private val personDao: PersonsDao, private val trainingDao: TrainingDao) {
 
     suspend fun fetchAndSavePersons() {
         val personResponse = apiService.loadPersonsResponse()
-        for (person in personResponse.getPersons()!!){
-            if (personDao.containsPerson(person.phone)){
-                personDao.add(person)
+        withContext(Dispatchers.IO) {
+            for (person in personResponse.getPersons()!!) {
+                if (personDao.containsPerson(person.phone)) {
+                    personDao.add(person)
+                }
             }
         }
+    }
+
+    suspend fun fetchAndSaveTrainings() {
         val trainingResponse = apiService.loadTrainingsResponse()
-        for (training in trainingResponse.trainings!!){
-                trainingDao.add(training)//тут нужна какая-то проверка на повторы??
+        withContext(Dispatchers.IO) {
+            for (training in trainingResponse.trainings!!) {
+                val existingTraining = trainingDao.getById(training.id)
+                if (existingTraining == null) {
+                    trainingDao.add(training)
+                }
+            }
         }
     }
 

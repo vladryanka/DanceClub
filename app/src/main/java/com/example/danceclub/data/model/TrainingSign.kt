@@ -2,6 +2,7 @@ package com.example.danceclub.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import java.util.UUID
 
 @Entity(
     tableName = "training_sign",
@@ -9,10 +10,10 @@ import androidx.room.Entity
 )
 data class TrainingSign(
     @ColumnInfo(name = "personId")
-    val personId: Long, // in JSON String
+    val personId: String = UUID.randomUUID().toString(),
 
     @ColumnInfo(name = "trainingId")
-    val trainingId: Long // in JSON String
+    val trainingId: String = UUID.randomUUID().toString()
 )
 
 

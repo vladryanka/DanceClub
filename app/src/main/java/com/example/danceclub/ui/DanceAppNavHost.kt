@@ -5,13 +5,19 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.danceclub.data.model.Person
 import com.example.danceclub.ui.navigation.GreetingDestination
 import com.example.danceclub.ui.navigation.ProfileDestination
 import com.example.danceclub.ui.navigation.RegistrationDestination
 import com.example.danceclub.ui.navigation.SignInDestination
+import com.example.danceclub.ui.navigation.TrainingsDestination
 import com.example.danceclub.ui.screens.auth.sign_up.RegistrationScreen
 import com.example.danceclub.ui.screens.auth.sing_in.SignInScreen
 import com.example.danceclub.ui.screens.greeting.GreetingScreen
+import com.example.danceclub.ui.screens.profile.ProfileScreen
+import com.example.danceclub.ui.screens.trainings.TrainingsScreen
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun DanceAppNavHost(
@@ -33,8 +39,10 @@ fun DanceAppNavHost(
         }
         composable<SignInDestination> {
             SignInScreen(
-                onNavigateToProfile = {
-                    navController.navigate(route = ProfileDestination) {
+                onNavigateToProfile = { person: Person ->
+                    val personJson = Json.encodeToString(person)
+                    navController.navigate(route = "$ProfileDestination/$personJson")
+                    {
                         popUpTo<ProfileDestination> {
                             inclusive = true
                         }
@@ -51,8 +59,10 @@ fun DanceAppNavHost(
         }
         composable<RegistrationDestination> {
             RegistrationScreen(
-                onNavigateToProfile = { // добавить передачу параметра phone
-                    navController.navigate(route = ProfileDestination) {
+                onNavigateToProfile = { person: Person ->
+                    val personJson = Json.encodeToString(person)
+                    navController.navigate(route = "$ProfileDestination/$personJson")
+                    {
                         popUpTo<ProfileDestination> {
                             inclusive = true
                         }
@@ -67,8 +77,12 @@ fun DanceAppNavHost(
                 }
             )
         }
-       /* composable<ProfileDestination> {
+        composable("$ProfileDestination/{personJson}") { backStackEntry ->
+            val personJson = backStackEntry.arguments?.getString("personJson")
+            val person =
+                Json.decodeFromString<Person>(personJson ?: "{}")
             ProfileScreen(
+                person = person,
                 onNavigateToTrainings = {
                     navController.navigate(route = TrainingsDestination)
                 }
@@ -82,12 +96,9 @@ fun DanceAppNavHost(
                             inclusive = true
                         }
                     }
-                },
-                onNavigateToDetail = { section: Training ->
-                    val sectionJson = Json.encodeToString(section)
-                    navController.navigate(route = "detail/$sectionJson")
                 }
+
             )
-        }*/
+        }
     }
 }

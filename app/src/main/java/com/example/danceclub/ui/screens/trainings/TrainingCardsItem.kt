@@ -1,6 +1,5 @@
 package com.example.danceclub.ui.screens.trainings
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,14 +44,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.danceclub.R
 import com.example.danceclub.data.model.Training
-import java.time.LocalDate
 
-@SuppressLint("NewApi")
+// Добавить фильтр по месяцу
+// краш на профиль назад
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TrainingCardsScreen(
+fun TrainingCardsItem(
     contentPadding: PaddingValues,
-    onNavigateToDetail: (Training) -> Unit
+    trainingList: List<Training>?,
+    updateCurrentTrainings: (Training) -> Unit,
+    changeVisibility: () -> Unit
 ) {
     val months = listOf(
         "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
@@ -61,9 +63,7 @@ fun TrainingCardsScreen(
     var expanded by remember { mutableStateOf(false) }
     var selectedMonth by remember { mutableStateOf(months[0]) }
     val isChecked: Boolean by remember { mutableStateOf(false) }
-    val trainingList = listOf(Training(22,"name","description",
-        LocalDate.of(2024,4,2),
-            true,9,10))
+
     Column(
         modifier = Modifier
             .padding(top = contentPadding.calculateTopPadding()),
@@ -104,14 +104,15 @@ fun TrainingCardsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(16.dp)
         ) {
-            itemsIndexed(trainingList) { _, item ->
+            itemsIndexed(trainingList ?: emptyList()) { _, item ->
                 Column(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .background(Color.LightGray)
                         .clip(RoundedCornerShape(16.dp))
                         .clickable(onClick = {
-                            onNavigateToDetail(item)
+                            updateCurrentTrainings(item)
+                            changeVisibility()
                         })
 
                 ) {
@@ -136,7 +137,7 @@ fun TrainingCardsScreen(
                         )
                         Column {
                             Text(
-                                text = "gfd",
+                                text = "Анна Владимирова",
                                 //text = item.teacher,
                                 color = Color.Black,
                                 maxLines = 1,
@@ -145,7 +146,7 @@ fun TrainingCardsScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "gfd",//text = item.info,
+                                text = item.status.toString(),
                                 color = Color.Gray,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -154,7 +155,7 @@ fun TrainingCardsScreen(
                         }
                     }
                     Text(
-                        text = "gfd",//text = item.price.toString(),
+                        text = "700 руб.",//text = item.price.toString(),
                         color = Color.Gray,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,

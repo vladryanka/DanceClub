@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.danceclub.R
+import com.example.danceclub.data.model.Person
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
 import kotlinx.coroutines.CoroutineScope
@@ -60,7 +61,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun SignInScreen(
     authorizationViewModel: SignInViewModel = viewModel(),
-    onNavigateToProfile: () -> Unit,
+    onNavigateToProfile: (Person) -> Unit,
     onNavigateUpToGreeting: () -> Unit,
 ) {
 
@@ -179,8 +180,8 @@ fun SignInScreen(
                                     duration = SnackbarDuration.Short
                                 )
                             }
-                        } else {
-                           /* if (person. != password) {  ПРОВЕРКА ПАРОЛЯ У КАКОЙ-ТО СУЩНОСТИ
+                        } else {/*
+                           if (person.password != password) {
                                 withContext(Dispatchers.Main) {
                                     snackbarHostState.showSnackbar(
                                         "Введен некорректный пароль",
@@ -189,7 +190,9 @@ fun SignInScreen(
                                     )
                                 }
                             } else {*/
-                                onNavigateToProfile()
+                            withContext(Dispatchers.Main) {
+                                onNavigateToProfile(person)
+                            }
                             //}
                         }
                     }

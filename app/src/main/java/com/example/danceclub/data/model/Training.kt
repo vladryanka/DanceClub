@@ -3,29 +3,34 @@ package com.example.danceclub.data.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.example.danceclub.data.local.converters.Converters
+import com.example.danceclub.data.local.serializer.LocalDateSerializer
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
+import java.util.UUID
 
 @Entity(tableName = "training")
 @Serializable
 data class Training(
 
-    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "id")
-    val id: Long,// в JSON String
+    @PrimaryKey
+    val id: String = UUID.randomUUID().toString(),
 
     @ColumnInfo(name = "name")
-    val name:String,
+    val name: String = "",
     @ColumnInfo(name = "description")
-    val description:String,
-    @Contextual
+    val description: String = "",
+    @Serializable(with = LocalDateSerializer::class)
+    @TypeConverters(Converters::class)
     @ColumnInfo(name = "date")
-    val date:LocalDate,
+    val date: LocalDate,
     @ColumnInfo(name = "status")
-    val status:Boolean,
+    val status: Int = 0,
     @ColumnInfo(name = "space")
-    val space:Int,
+    val space: Int = 0,
     @ColumnInfo(name = "freeSpace")
-    val freeSpace:Int
+    val freeSpace: Int = 0
 )

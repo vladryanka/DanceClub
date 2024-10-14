@@ -4,16 +4,18 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 @Serializable
 @Entity(tableName = "persons")
 data class Person(
-    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "id")
-    val id: Long, // If a primary key is annotated with autoGenerate, its type must be int, Integer, long or Long.
-    // в JSON оно String
+    @PrimaryKey
+    val id: String = UUID.randomUUID().toString(),
     @ColumnInfo(name = "name")
     val name: String,
+    /*@ColumnInfo(name = "password")
+    val password: String,*/
     @ColumnInfo(name = "surname")
     val surname: String,
     @ColumnInfo(name = "patronimic")

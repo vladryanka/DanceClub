@@ -58,13 +58,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.random.Random
+import java.util.UUID
+
+// добавить проверку на номер телефона. если уже есть в бд - нельзя зарегистрироваться!
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationScreen(
     registrationViewModel: RegistrationViewModel = viewModel(),
-    onNavigateToProfile: () -> Unit,
+    onNavigateToProfile: (Person) -> Unit,
     onNavigateUpToGreeting: () -> Unit,
 ) {
     var personList:List<Person>? = emptyList()
@@ -283,18 +285,20 @@ fun RegistrationScreen(
                                     {
                                         nameList.add(" ")
                                     }
+                                    val person = Person(
+                                        id = UUID.randomUUID().toString(),
+                                        name = nameList[1],
+                                        surname = nameList[0],
+                                        //password = password,
+                                        patronimic = nameList[2],
+                                        age = age.toInt(),
+                                        phone = phone
+                                    )
                                     registrationViewModel.savePerson(
-                                        Person(
-                                            id = Random.nextInt(0,10000).toLong(),
-                                            name = nameList[1],
-                                            surname = nameList[0],
-                                            patronimic = nameList[2],
-                                            age = age.toInt(),
-                                            phone = phone
-                                        )
+                                        person
                                     )
                                     withContext(Dispatchers.Main) {
-                                        onNavigateToProfile()
+                                        onNavigateToProfile(person)
                                     }
                                 } else {
                                     scope.launch {

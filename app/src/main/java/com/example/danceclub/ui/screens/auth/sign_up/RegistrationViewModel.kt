@@ -21,7 +21,6 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
     suspend fun fetchAndStorePersons() {
         repository.fetchAndSavePersons()
     }
-
     fun savePerson(person: Person) {
         Log.d("Doing", "Пришли в savePerson")
         personDao.add(person)
