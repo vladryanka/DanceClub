@@ -1,5 +1,6 @@
 package com.example.danceclub.ui
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent

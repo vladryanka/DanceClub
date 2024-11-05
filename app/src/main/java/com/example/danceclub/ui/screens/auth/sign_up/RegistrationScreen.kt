@@ -30,6 +30,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,11 +70,10 @@ fun RegistrationScreen(
     onNavigateToProfile: (Person) -> Unit,
     onNavigateUpToGreeting: () -> Unit,
 ) {
-    var personList:List<Person>? = emptyList()
+    val personList by registrationViewModel.getPersons().collectAsState(initial = emptyList())
 
     LaunchedEffect(Unit) {
         registrationViewModel.fetchAndStorePersons()
-        personList = registrationViewModel.getPersons().value
     }
     var textStateName by remember { mutableStateOf(TextFieldValue()) }
     var textStateAge by remember { mutableStateOf(TextFieldValue()) }
@@ -277,7 +277,7 @@ fun RegistrationScreen(
                             }
                         else {
                             CoroutineScope(Dispatchers.IO).launch {
-                                val containsPerson = personList?.any { it.phone == phone }
+                                val containsPerson = personList?.any { it.id == phone }
 
                                 if (containsPerson == false) {
                                     val nameList = name.split(" ").toMutableList()

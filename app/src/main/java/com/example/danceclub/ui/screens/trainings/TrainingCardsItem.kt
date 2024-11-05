@@ -25,12 +25,15 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,8 +45,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.danceclub.R
 import com.example.danceclub.data.model.Training
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 // Добавить фильтр по месяцу
 // краш на профиль назад
@@ -52,17 +58,24 @@ import com.example.danceclub.data.model.Training
 @Composable
 fun TrainingCardsItem(
     contentPadding: PaddingValues,
-    trainingList: List<Training>?,
     updateCurrentTrainings: (Training) -> Unit,
-    changeVisibility: () -> Unit
+    changeVisibility: () -> Unit,
+    trainingScreenViewModel: TrainingScreenViewModel
 ) {
     val months = listOf(
-        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+        "Все","Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
         "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
     )
     var expanded by remember { mutableStateOf(false) }
-    var selectedMonth by remember { mutableStateOf(months[0]) }
+
+    var selectedMonth by remember { mutableStateOf(months[LocalDate.now().monthValue]) }
     val isChecked: Boolean by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    var trainingList = trainingScreenViewModel.currentMonthTrainings(LocalDate.now().monthValue)
+
 
     Column(
         modifier = Modifier
@@ -78,6 +91,7 @@ fun TrainingCardsItem(
                     readOnly = true,
                     value = selectedMonth,
                     onValueChange = {},
+                    modifier = Modifier.clickable(onClick = { expanded = !expanded }),//мб не нужно
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
@@ -95,11 +109,15 @@ fun TrainingCardsItem(
                         DropdownMenuItem(onClick = {
                             selectedMonth = month
                             expanded = false
+                            trainingList = trainingScreenViewModel.currentMonthTrainings(
+                                months.indexOf(month)
+                            )
                         }, text = { Text(month) })
                     }
                 }
             }
         }
+
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(16.dp)
@@ -112,7 +130,17 @@ fun TrainingCardsItem(
                         .clip(RoundedCornerShape(16.dp))
                         .clickable(onClick = {
                             updateCurrentTrainings(item)
+                            if (item.freeSpace>0)
                             changeVisibility()
+                            else {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        "Свободных мест нет",
+                                        withDismissAction = true,
+                                        duration = SnackbarDuration.Short
+                                    )
+                                }
+                            }
                         })
 
                 ) {

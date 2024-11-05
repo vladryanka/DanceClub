@@ -29,6 +29,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -170,8 +171,10 @@ fun SignInScreen(
             Button(
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
-                        val person = authorizationViewModel.findPerson(phone)
+                        val responce = authorizationViewModel.login(phone, password)
 
+
+                        val person = authorizationViewModel.findPerson(phone)
                         if (person == null) {
                             withContext(Dispatchers.Main) {
                                 snackbarHostState.showSnackbar(

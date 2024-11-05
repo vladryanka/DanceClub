@@ -23,12 +23,12 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
     val personWithPhone: LiveData<List<Person>> get() = _personWithPhone
 
     init {
-        fetchAndStorePersons()
+        //fetchAndStorePersons()
     }
 
-    private fun fetchAndStorePersons() {
+    private fun fetchAndStorePersons(token:String) {
         viewModelScope.launch {
-            repository.fetchAndSavePersons()
+            repository.fetchAndSavePersons(token)
             updatePersons()
         }
     }

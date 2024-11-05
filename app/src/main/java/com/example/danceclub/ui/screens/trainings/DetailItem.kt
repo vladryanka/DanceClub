@@ -113,7 +113,7 @@ fun DetailItem(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "dfgdf",
+                    text = training.description,
                     //text = item.info,
                     color = Color.Gray,
                     maxLines = 1,

@@ -7,10 +7,10 @@ import com.example.danceclub.data.model.Person
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface PersonsDao {
+interface AuthDao {
 
     @Query("SELECT * FROM persons")
-    fun getPersons(): Flow<List<Person>>
+    fun getAuth(): Flow<List<Person>>
 
     @Insert
     fun add(person: Person)
@@ -22,5 +22,6 @@ interface PersonsDao {
     fun searchPerson(phone: String): Person?
 
     // TODO: replacePerson()
+
 
 }

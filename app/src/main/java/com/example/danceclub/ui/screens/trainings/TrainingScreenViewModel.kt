@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.danceclub.data.local.AppDatabase
 import com.example.danceclub.data.local.dao.PersonsDao
 import com.example.danceclub.data.local.dao.TrainingDao
+import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.data.remote.DanceRepository
 import kotlinx.coroutines.launch
@@ -34,6 +35,20 @@ class TrainingScreenViewModel(application: Application) : AndroidViewModel(appli
             repository.fetchAndSaveTrainings()
             updateTrainings()
         }
+    }
+
+    fun currentMonthTrainings(month: Int): List<Training>? {
+        val trainingList = trainings.value
+        val trainingWithMonth: MutableList<Training> = mutableListOf()
+        if (month == 0)
+            return trainingList
+        if (trainingList != null) {
+            for (i in trainingList) {
+                if (i.date.monthValue == month)
+                    trainingWithMonth.add(i)
+            }
+        }
+        return trainingWithMonth
     }
 
     private fun updateTrainings() {

@@ -11,6 +11,7 @@ import com.example.danceclub.data.local.dao.TrainingDao
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.data.local.converters.Converters
+import com.example.danceclub.data.local.dao.AuthDao
 import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.model.TrainingSign
 
@@ -24,6 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun personsDao(): PersonsDao
     abstract fun trainingsDao(): TrainingDao
     abstract fun trainingSignsDao(): TrainingSignDao
+    abstract fun authDao(): AuthDao
 
 
     companion object {
