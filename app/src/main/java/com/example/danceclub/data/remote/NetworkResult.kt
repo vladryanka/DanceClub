@@ -29,7 +29,7 @@ suspend fun <T : Any> handleApi(
                 401 -> NetworkResult.Error(response.code(), "Incorrect username and password")
                 409 -> NetworkResult.Error(response.code(), "User with same phone already exists")
                 422 -> {
-                    Log.d("Doing",response.body().toString())
+                    Log.d("Doing",response.errorBody()?.string().toString())
                     NetworkResult.Error(response.code(), "Validation Error")
                 }
                 else -> NetworkResult.Error(response.code(), "Unknown Error")

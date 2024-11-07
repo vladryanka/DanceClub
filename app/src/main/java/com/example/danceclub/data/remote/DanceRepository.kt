@@ -131,6 +131,7 @@ class DanceRepository(private val personDao: PersonsDao, private val trainingDao
         age : Int,
         phone : String, password: String
     ): Pair<String?, Person?> {
+        Log.d("Doing","$name $surname $patronimic $age $phone $password")
         val register = apiService.register(
             name, surname,
             patronimic, age,

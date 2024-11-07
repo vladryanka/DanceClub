@@ -43,6 +43,7 @@ interface DanceApiService {
     @GET("training/signed")
     suspend fun loadSignedTrainingResponse(@Header("Authorization") bearerToken: String): TrainingResponse
 
+
     @GET("person/all")
     suspend fun loadPersonsResponse(@Header("Authorization") bearerToken: String): PersonResponse
 
