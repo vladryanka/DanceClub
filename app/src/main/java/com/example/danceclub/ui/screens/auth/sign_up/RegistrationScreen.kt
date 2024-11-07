@@ -30,7 +30,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,10 +69,12 @@ fun RegistrationScreen(
     onNavigateToProfile: (Person) -> Unit,
     onNavigateUpToGreeting: () -> Unit,
 ) {
-    val personList by registrationViewModel.getPersons().collectAsState(initial = emptyList())
+    val personList = mutableListOf<Person>()
 
     LaunchedEffect(Unit) {
-        registrationViewModel.fetchAndStorePersons()
+        registrationViewModel.getPersons().collect { persons ->
+            personList.addAll(persons)
+        }
     }
     var textStateName by remember { mutableStateOf(TextFieldValue()) }
     var textStateAge by remember { mutableStateOf(TextFieldValue()) }
@@ -277,28 +278,36 @@ fun RegistrationScreen(
                             }
                         else {
                             CoroutineScope(Dispatchers.IO).launch {
-                                val containsPerson = personList?.any { it.id == phone }
+                                val containsPerson = personList.any { it.phone == phone }
 
-                                if (containsPerson == false) {
+                                if (!containsPerson) {
                                     val nameList = name.split(" ").toMutableList()
-                                    if (nameList.size == 2)
-                                    {
-                                        nameList.add(" ")
+                                    if (nameList.size == 2) {
+                                        nameList.add("")
                                     }
-                                    val person = Person(
-                                        id = UUID.randomUUID().toString(),
+                                    val result = registrationViewModel.savePerson(
                                         name = nameList[1],
                                         surname = nameList[0],
-                                        //password = password,
                                         patronimic = nameList[2],
                                         age = age.toInt(),
-                                        phone = phone
+                                        phone = phone, password
                                     )
-                                    registrationViewModel.savePerson(
-                                        person
-                                    )
-                                    withContext(Dispatchers.Main) {
-                                        onNavigateToProfile(person)
+                                    if (result.first) {
+                                        personList.clear()
+                                        registrationViewModel.getPersons().collect { persons ->
+                                            personList.addAll(persons)
+                                        }
+                                        withContext(Dispatchers.Main) {
+                                            onNavigateToProfile(personList.find { it.phone == phone }!!)
+                                        }
+                                    } else {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                result.second,
+                                                withDismissAction = true,
+                                                duration = SnackbarDuration.Short
+                                            )
+                                        }
                                     }
                                 } else {
                                     scope.launch {

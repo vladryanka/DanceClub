@@ -21,6 +21,4 @@ interface PersonsDao {
     @Query("SELECT * FROM persons WHERE phone LIKE :phone")
     fun searchPerson(phone: String): Person?
 
-    // TODO: replacePerson()
-
 }

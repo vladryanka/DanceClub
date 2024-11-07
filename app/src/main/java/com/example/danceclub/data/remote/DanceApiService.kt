@@ -1,16 +1,18 @@
 package com.example.danceclub.data.remote
 
-import com.example.danceclub.data.model.Person
+import com.example.danceclub.data.model.RegistrationResponse
 import com.example.danceclub.data.model.Token
 import com.example.danceclub.data.model.Training
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.Response
+import retrofit2.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.http.Body
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
@@ -21,17 +23,7 @@ private const val BASE_URL: String = "https://mega-prod.ru/"
 private val interceptor = HttpLoggingInterceptor().apply {
     level = HttpLoggingInterceptor.Level.BODY
 }
-/*
-private val authInterceptor = Interceptor { chain ->
-    val originalRequest = chain.request()
-    // Предположим, что вы храните токен где-то в вашем приложении
-    val token = "ваш_токен" // Замените на ваш текущий токен
-    val newRequest = originalRequest.newBuilder()
-        .addHeader("Authorization", "Bearer $token") // Добавляем заголовок Authorization
-        .build()
-    chain.proceed(newRequest) // Выполняем запрос с новым заголовком
-}
-*/
+
 private val okHttpClient = OkHttpClient.Builder()
     .addInterceptor(interceptor)
     .build()
@@ -49,37 +41,43 @@ interface DanceApiService {
     suspend fun loadTrainingsResponse(): TrainingResponse
 
     @GET("training/signed")
-    suspend fun loadSignedTrainingResponse(): Training
+    suspend fun loadSignedTrainingResponse(@Header("Authorization") bearerToken: String): TrainingResponse
 
-    @Headers("Content-Type: application/json")
     @GET("person/all")
-    suspend fun loadPersonsResponse(@Header("Authorization") token: String): PersonResponse
-
-    @POST("person/add")
-    suspend fun pushNewPerson(@Body person: Person)
+    suspend fun loadPersonsResponse(@Header("Authorization") bearerToken: String): PersonResponse
 
     @POST("training/add")
     suspend fun pushNewTraining(@Body training: Training)
 
+    @FormUrlEncoded
     @POST("auth/login")
-    suspend fun login(@Body phone:String, password:String): Response
-
-    @POST("auth/logout")
-    suspend fun logout(@Body training: Training)
+    suspend fun login(
+        @Field("phone") phone: String, @Field("password") password: String
+    ): Response<Token>
 
     @POST("auth/newTokens")
-    suspend fun newTokens(@Body training: Training)
+    suspend fun newTokens(@Header("Authorization") bearerToken: String): Response<Token>
+
 
     @POST("auth/newAccessToken")
-    suspend fun newAccessToken(@Body training: Training)
+    suspend fun newAccessToken(@Header("Authorization") bearerToken: String): Response<Token>
 
     @POST("auth/changePassword")
-    suspend fun changePassword(@Body training: Training)
+    suspend fun changePassword(
+        @Header("Authorization") bearerToken: String,
+        @Body training: Training
+    )
 
+    @FormUrlEncoded
     @POST("auth/register")
-    suspend fun register(@Body training: Training)
-
-
+    suspend fun register(
+        @Field("name") name: String,
+        @Field("surname") surname: String,
+        @Field("patronimic") patronimic: String,
+        @Field("age") age: Int,
+        @Field("phone") phone: String,
+        @Field("password") password: String
+    ): Response<RegistrationResponse>
 }
 
 object DanceApi {

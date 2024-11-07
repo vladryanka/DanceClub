@@ -29,7 +29,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -171,32 +170,31 @@ fun SignInScreen(
             Button(
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
-                        val responce = authorizationViewModel.login(phone, password)
+                        val response = authorizationViewModel.login(phone, password)
 
-
-                        val person = authorizationViewModel.findPerson(phone)
-                        if (person == null) {
-                            withContext(Dispatchers.Main) {
-                                snackbarHostState.showSnackbar(
-                                    "Введен некорректный телефон",
-                                    withDismissAction = true,
-                                    duration = SnackbarDuration.Short
-                                )
-                            }
-                        } else {/*
-                           if (person.password != password) {
+                        if (response.first) {
+                            val person = authorizationViewModel.findPerson(phone)
+                            if (person != null)
+                                withContext(Dispatchers.Main) {
+                                    onNavigateToProfile(person)
+                                }
+                            else
                                 withContext(Dispatchers.Main) {
                                     snackbarHostState.showSnackbar(
-                                        "Введен некорректный пароль",
+                                        "Пользователь не зарегистрирован",
                                         withDismissAction = true,
                                         duration = SnackbarDuration.Short
                                     )
                                 }
-                            } else {*/
+
+                        } else {
                             withContext(Dispatchers.Main) {
-                                onNavigateToProfile(person)
+                                snackbarHostState.showSnackbar(
+                                    response.second,
+                                    withDismissAction = true,
+                                    duration = SnackbarDuration.Short
+                                )
                             }
-                            //}
                         }
                     }
                 },

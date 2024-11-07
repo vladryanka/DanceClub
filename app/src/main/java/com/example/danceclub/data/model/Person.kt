@@ -14,8 +14,6 @@ data class Person(
     val id: String = UUID.randomUUID().toString(),
     @ColumnInfo(name = "name")
     val name: String,
-    /*@ColumnInfo(name = "password")
-    val password: String,*/
     @ColumnInfo(name = "surname")
     val surname: String,
     @ColumnInfo(name = "patronimic")

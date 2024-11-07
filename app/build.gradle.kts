@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
     implementation(libs.accompanist.swiperefresh)
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.0.1")
 
     //Pictures
     implementation(libs.coil.compose)
