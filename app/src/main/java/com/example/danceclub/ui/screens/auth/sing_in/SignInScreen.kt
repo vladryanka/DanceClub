@@ -57,6 +57,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+//TODO добавить пост картинки
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(

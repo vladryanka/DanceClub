@@ -1,5 +1,6 @@
 package com.example.danceclub.ui.screens.auth.sign_up
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -29,7 +30,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +58,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.UUID
 
 // добавить проверку на номер телефона. если уже есть в бд - нельзя зарегистрироваться!
 
@@ -69,13 +68,7 @@ fun RegistrationScreen(
     onNavigateToProfile: (Person) -> Unit,
     onNavigateUpToGreeting: () -> Unit,
 ) {
-    val personList = mutableListOf<Person>()
 
-    LaunchedEffect(Unit) {
-        registrationViewModel.getPersons().collect { persons ->
-            personList.addAll(persons)
-        }
-    }
     var textStateName by remember { mutableStateOf(TextFieldValue()) }
     var textStateAge by remember { mutableStateOf(TextFieldValue()) }
     var textStatePhone by remember { mutableStateOf(TextFieldValue()) }
@@ -278,7 +271,10 @@ fun RegistrationScreen(
                             }
                         else {
                             CoroutineScope(Dispatchers.IO).launch {
-                                val containsPerson = personList.any { it.phone == phone }
+                                val containsPerson =
+                                    if (registrationViewModel.findPerson(phone) != null) {
+                                        true
+                                    } else false
 
                                 if (!containsPerson) {
                                     val nameList = name.split(" ").toMutableList()
@@ -292,13 +288,24 @@ fun RegistrationScreen(
                                         age = age.toInt(),
                                         phone = phone, password
                                     )
+                                    Log.d("Doing", result.first.toString())
                                     if (result.first) {
-                                        personList.clear()
-                                        registrationViewModel.getPersons().collect { persons ->
-                                            personList.addAll(persons)
+                                        val personForNav = registrationViewModel.findPerson(phone)
+                                        personForNav?.let {
+                                            Log.d(
+                                                "Doing",
+                                                personForNav.toString()
+                                            )
                                         }
                                         withContext(Dispatchers.Main) {
-                                            onNavigateToProfile(personList.find { it.phone == phone }!!)
+                                            personForNav?.let { onNavigateToProfile(personForNav) }
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(
+                                                    "Пользователь не найден",
+                                                    withDismissAction = true,
+                                                    duration = SnackbarDuration.Short
+                                                )
+                                            }
                                         }
                                     } else {
                                         scope.launch {

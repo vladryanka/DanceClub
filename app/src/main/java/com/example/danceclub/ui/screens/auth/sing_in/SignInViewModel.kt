@@ -10,6 +10,7 @@ import com.example.danceclub.data.remote.DanceRepository
 
 class SignInViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val appDatabase = AppDatabase.getInstance(application)
     private val personDao: PersonsDao = AppDatabase.getInstance(application).personsDao()
     private val trainingDao: TrainingDao = AppDatabase.getInstance(application).trainingsDao()
     private val repository: DanceRepository = DanceRepository(personDao, trainingDao)

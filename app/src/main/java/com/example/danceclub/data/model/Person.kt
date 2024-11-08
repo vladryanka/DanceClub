@@ -21,5 +21,7 @@ data class Person(
     @ColumnInfo(name = "age")
     val age: Int,
     @ColumnInfo(name = "phone")
-    val phone: String
+    val phone: String,
+    @ColumnInfo(name = "picture")
+    val picture: String?
 )
