@@ -14,8 +14,11 @@ import com.example.danceclub.data.local.dao.TrainingDao
 import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.model.Token
 import com.example.danceclub.data.model.Training
+import com.example.danceclub.data.model.TrainingSign
 import com.example.danceclub.data.remote.RepositoryProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ProfileScreenViewModel(application: Application) : AndroidViewModel(application) {
     private val personDao: PersonsDao = AppDatabase.getInstance(application).personsDao()
@@ -24,8 +27,11 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
         AppDatabase.getInstance(application).trainingSignsDao()
     private val repository = RepositoryProvider.getRepository()
     private val _trainings: MutableLiveData<List<Training>> = MutableLiveData(emptyList())
+    private val _trainingSigns: MutableLiveData<List<TrainingSign>> = MutableLiveData(emptyList())
     private val _savedImage: MutableLiveData<Boolean> = MutableLiveData(false)
     val trainings: LiveData<List<Training>> get() = _trainings
+    val trainingSign: LiveData<List<TrainingSign>> get() = _trainingSigns
+
     val savedImage: LiveData<Boolean> get() = _savedImage
 
     init {
@@ -36,7 +42,26 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
         return repository.token
     }
 
-    suspend fun saveImage(image: Uri, contentResolver: ContentResolver) {
+    private fun findTrainingNameById(trainingId: String): Training? {
+        return trainingDao.getById(trainingId)
+    }
+
+    suspend fun getListNamesOfTraining(): List<Training>? {
+        return withContext(Dispatchers.IO) {
+            val list: MutableList<Training> = mutableListOf()
+            val listOfSigned = trainingSign.value ?: return@withContext null
+
+            for (i in listOfSigned) {
+                val training = findTrainingNameById(i.trainingId)
+                if (training != null) {
+                    list.add(training)
+                }
+            }
+            list
+        }
+    }
+
+    suspend fun saveImage(image: Uri, contentResolver: ContentResolver):String? {
         Log.d("Doing", "Пришли в saveImage")
 
         val result = repository.putImage(image, contentResolver)
@@ -46,13 +71,17 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
         result?.let {
             Log.d("Doing", result)
         }
+        return result
 
     }
+
+    suspend fun getImage():String?= repository.getImage()
 
 
     private fun fetchAndStoreTrainings() {
         viewModelScope.launch {
             repository.fetchAndSaveTrainings()
+            repository.fetchAndSaveSignedTrainings()
             updateTrainings()
         }
     }
@@ -60,12 +89,11 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
     private fun updateTrainings() {
         viewModelScope.launch {
             val trainingList = trainingDao.getTrainingsSync()
+            val trainingSignList = trainingSignDao.getTrainingSignsSync()
             _trainings.postValue(trainingList)
+            _trainingSigns.postValue(trainingSignList)
         }
     }
 
-    fun getTrainingSign() {
-        repository.getSignedTrainings()
-    }
 
 }

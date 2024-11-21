@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -21,10 +22,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +50,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.danceclub.R
 import com.example.danceclub.data.model.Person
+import com.example.danceclub.data.model.Training
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +66,10 @@ fun ProfileScreen(
 ) {
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var signedTrainingList by remember { mutableStateOf<List<Training>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
+    var imageFromServer by remember { mutableStateOf<String?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val context = LocalContext.current
     val getContent = rememberLauncherForActivityResult(
@@ -70,13 +79,31 @@ fun ProfileScreen(
             selectedImageUri = it
             coroutineScope.launch {
                 withContext(Dispatchers.IO) {
-                    viewModel.saveImage(it, context.contentResolver)
+                    val result = viewModel.saveImage(it, context.contentResolver)
+                    if (result != null)
+                        snackbarHostState.showSnackbar(
+                            result,
+                            withDismissAction = true,
+                            duration = SnackbarDuration.Short
+                        )
+
                 }
             }
         }
     }
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            imageFromServer = viewModel.getImage()
+            Log.d("Doing", imageFromServer.toString())
+        }
+    }
 
-    val signedTrainingList = viewModel.getTrainingSign()
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val trainingList = viewModel.getListNamesOfTraining()
+            signedTrainingList = trainingList ?: emptyList()
+        }
+    }
 
 
     Column(
@@ -92,7 +119,9 @@ fun ProfileScreen(
         ) {
 
             Image(
-                painter = rememberAsyncImagePainter(selectedImageUri ?: R.drawable.profile_image),
+                painter = rememberAsyncImagePainter(
+                    imageFromServer ?: selectedImageUri ?: R.drawable.profile_image
+                ),
                 contentDescription = "Profile Image",
                 modifier = Modifier
                     .size(160.dp)
@@ -164,11 +193,39 @@ fun ProfileScreen(
             style = TextStyle(
                 fontSize = 16.sp
             ),
+            modifier = Modifier.padding(8.dp),
             color = Color.Black
         )
 
-        LazyColumn {
-
+        LazyColumn(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (signedTrainingList.isEmpty()) {
+                item {
+                    Text(
+                        text = "Записей нет",
+                        style = TextStyle(fontSize = 16.sp),
+                        color = Color.Gray,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            } else {
+                itemsIndexed(signedTrainingList) { _, item ->
+                    Row {
+                        Text(
+                            text = item.name,
+                            style = TextStyle(fontSize = 16.sp),
+                            color = Color.Black
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = item.date.toString(),
+                            style = TextStyle(fontSize = 16.sp),
+                            color = Color.Black
+                        )
+                    }
+                }
+            }
         }
     }
 

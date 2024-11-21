@@ -54,9 +54,9 @@ class DanceRepository(
         }
     }
 
-    suspend fun postSign(training: Training, personId: String):String?{
+    suspend fun postSign(training: Training, personId: String): String? {
         Log.d("Doing", token.toString())
-        val response = apiService.addSign("Bearer ${token.accessToken}",training.id)
+        val response = apiService.addSign("Bearer ${token.accessToken}", training.id)
         val result = handleApi { response }
         var errorType: String? = null
         when (result) {
@@ -123,7 +123,8 @@ class DanceRepository(
 
                 } else {
                     CoroutineScope(Dispatchers.IO).launch() {
-                        val newAccessToken = apiService.newAccessToken("Bearer ${token.refreshToken}")
+                        val newAccessToken =
+                            apiService.newAccessToken("Bearer ${token.refreshToken}")
                         token = newAccessToken.body()?.let {
                             Token(
                                 accessToken = it.accessToken,
@@ -176,6 +177,7 @@ class DanceRepository(
                 is NetworkResult.Success -> {
                     errorType = "1"
                 }
+
                 is NetworkResult.Error -> {
                     errorType = result.errorMsg
                     Log.d("Error", "$errorType")
@@ -187,6 +189,31 @@ class DanceRepository(
                 }
             }
         }
+        return errorType
+    }
+
+    suspend fun getImage(): String? {
+
+        var errorType: String? = null
+        getCurrentAccessToken()
+        val response = apiService.getImage("Bearer ${token.accessToken}")
+        val result = handleApi { response }
+        when (result) {
+            is NetworkResult.Success -> {
+                errorType = result.data.image
+            }
+
+            is NetworkResult.Error -> {
+                errorType = result.errorMsg
+                Log.d("Error", "$errorType")
+            }
+
+            is NetworkResult.Exception -> {
+                Log.d("Exception", result.e.toString())
+                errorType = "Неизвестная ошибка"
+            }
+        }
+
         return errorType
     }
 
@@ -264,8 +291,10 @@ class DanceRepository(
         }
     }
 
-    suspend fun fetchAndSaveSignedTrainings() { // TODO
-        val trainingSignedResponse = apiService.loadSignedTrainingResponse().trainings ?: return
+    suspend fun fetchAndSaveSignedTrainings() {
+        val trainingSignedResponse = apiService.loadSignedTrainingResponse(
+            "Bearer ${token.accessToken}"
+        ).trainings ?: return
         val trainingList = trainingSignDao.getTrainingSignsSync()
         withContext(Dispatchers.IO) {
             val existingTrainingIds = trainingList.map { it.trainingId }.toSet()
@@ -282,18 +311,18 @@ class DanceRepository(
     suspend fun fetchAndSaveTrainings() {
         val trainingResponse = apiService.loadTrainingsResponse().trainings
         val trainingList = trainingDao.getTrainingsSync()
+        Log.d("Doing", trainingList.toString())
+        val existingTrainingIds = trainingList.map { it.id }.toSet()
         withContext(Dispatchers.IO) {
             for (training in trainingResponse!!) {
-                if (!trainingList.contains(training)) {
+                if (!existingTrainingIds.contains(training.id)) {
+                    Log.d("Doing", "Adding training: ${training.toString()}")
                     trainingDao.add(training)
+                } else {
+                    Log.d("Doing", "Training already exists: ${training.toString()}")
                 }
             }
         }
-    }
-
-
-    fun getSignedTrainings() {
-        //return apiService.loadSignedTrainingResponse()
     }
 
 
