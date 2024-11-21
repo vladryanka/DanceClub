@@ -1,22 +1,25 @@
 package com.example.danceclub.data.local.converters
 
 import androidx.room.TypeConverter
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.ZoneOffset
 
 class Converters {
-    private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     private val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 
     @TypeConverter
-    fun fromLocalDate(date: LocalDate?): String? {
-        return date?.format(dateFormatter)
+    fun fromLocalDate(date: LocalDate?): Long? {
+        return date?.atStartOfDay(ZoneOffset.UTC)?.toEpochSecond() // Конвертация в timestamp
     }
 
     @TypeConverter
-    fun toLocalDate(dateString: String?): LocalDate? {
-        return dateString?.let { LocalDate.parse(it, dateFormatter) }
+    fun toLocalDate(timestamp: Long?): LocalDate? {
+        return timestamp?.let {
+            Instant.ofEpochSecond(it).atZone(ZoneOffset.UTC).toLocalDate() // Конвертация из timestamp
+        }
     }
 
     @TypeConverter

@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -21,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -60,7 +60,7 @@ fun ProfileScreen(
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Обработчик результата для выбора изображения
+    val context = LocalContext.current
     val getContent = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
@@ -68,12 +68,11 @@ fun ProfileScreen(
         selectedImageUri = uri
         selectedImageUri?.let {
             CoroutineScope(Dispatchers.IO).launch {
-                viewModel.saveImage(it, person)
+                viewModel.saveImage(it, context.contentResolver)
             }
         }
     }
-    Log.d("Doing", "создали getContent")
-    val context = LocalContext.current
+
 
     Column(
         modifier = Modifier
@@ -128,6 +127,11 @@ fun ProfileScreen(
                     color = Color.Black
                 )
                 Text(
+                    text = "${person.birth_date}",
+                    style = TextStyle(fontSize = 16.sp),
+                    color = Color.Black
+                )
+                Text(
                     text = person.phone,
                     style = TextStyle(fontSize = 16.sp),
                     color = Color.Gray
@@ -149,6 +153,17 @@ fun ProfileScreen(
                 ),
                 color = Color.Blue
             )
+        }
+        Text(
+            text = "Мои тренировки:",
+            style = TextStyle(
+                fontSize = 16.sp
+            ),
+            color = Color.Black
+        )
+
+        LazyColumn {
+
         }
     }
 

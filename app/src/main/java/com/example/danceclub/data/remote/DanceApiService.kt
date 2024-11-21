@@ -1,10 +1,12 @@
 package com.example.danceclub.data.remote
 
-import com.example.danceclub.data.model.LoginRequest
-import com.example.danceclub.data.model.RegisterRequest
-import com.example.danceclub.data.model.RegistrationResponse
+import com.example.danceclub.data.request.LoginRequest
+import com.example.danceclub.data.request.RegisterRequest
+import com.example.danceclub.data.response.RegistrationResponse
 import com.example.danceclub.data.model.Token
 import com.example.danceclub.data.model.Training
+import com.example.danceclub.data.response.PersonResponse
+import com.example.danceclub.data.response.TrainingResponse
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -16,6 +18,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Query
 
 private const val BASE_URL: String = "https://mega-prod.ru/"
 
@@ -43,8 +47,7 @@ interface DanceApiService {
     suspend fun loadTrainingsResponse(): TrainingResponse
 
     @GET("training/signed")
-    suspend fun loadSignedTrainingResponse(@Header("Authorization") bearerToken: String): TrainingResponse
-
+    suspend fun loadSignedTrainingResponse(): TrainingResponse
 
     @GET("person/all")
     suspend fun loadPersonsResponse(@Header("Authorization") bearerToken: String): PersonResponse
@@ -74,6 +77,23 @@ interface DanceApiService {
     suspend fun register(
         @Body registerRequest: RegisterRequest
     ): Response<RegistrationResponse>
+
+    @POST("sign/add")
+    suspend fun addSign(
+        @Header("Authorization") bearerToken: String,
+        @Query("trainingId")trainingId: String
+    ):Response<Void>
+
+    @PUT("person/picture")
+    suspend fun putImage(
+        @Header("Authorization") bearerToken: String,
+        @Query("image")image: String
+    ):Response<Void>
+
+    @GET("person/picture")
+    suspend fun getImage(
+        @Header("Authorization") bearerToken: String
+    ):Response<String>
 }
 
 object DanceApi {

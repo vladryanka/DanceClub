@@ -1,4 +1,4 @@
-package com.example.danceclub.data.model
+package com.example.danceclub.data.request
 
 import kotlinx.serialization.Serializable
 

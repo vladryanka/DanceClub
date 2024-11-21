@@ -1,10 +1,9 @@
 package com.example.danceclub.ui.screens.trainings
 
-import androidx.compose.foundation.Image
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,13 +37,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.danceclub.R
 import com.example.danceclub.data.model.Training
 import kotlinx.coroutines.launch
@@ -60,7 +56,7 @@ fun TrainingCardsItem(
     contentPadding: PaddingValues,
     updateCurrentTrainings: (Training) -> Unit,
     changeVisibility: () -> Unit,
-    trainingScreenViewModel: TrainingScreenViewModel
+    currentMonthTrainings: (Int) -> List<Training>?
 ) {
     val months = listOf(
         "Все","Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
@@ -74,7 +70,7 @@ fun TrainingCardsItem(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var trainingList = trainingScreenViewModel.currentMonthTrainings(LocalDate.now().monthValue)
+    var trainingList = currentMonthTrainings(LocalDate.now().monthValue)
 
 
     Column(
@@ -86,34 +82,30 @@ fun TrainingCardsItem(
     {
 
         ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-            Box {
-                TextField(
-                    readOnly = true,
-                    value = selectedMonth,
-                    onValueChange = {},
-                    modifier = Modifier.clickable(onClick = { expanded = !expanded }),//мб не нужно
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null
-                        )
-                    }
-                )
+            TextField(
+                readOnly = true,
+                value = selectedMonth,
+                onValueChange = {},
+                modifier = Modifier.clickable(onClick = { expanded = true }),
+                trailingIcon = {
+                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
+                }
+            )
 
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier.clip(RoundedCornerShape(60.dp))
-                ) {
-                    months.forEach { month ->
-                        DropdownMenuItem(onClick = {
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.clip(RoundedCornerShape(60.dp))
+            ) {
+                months.forEach { month ->
+                    DropdownMenuItem(
+                        onClick = {
                             selectedMonth = month
                             expanded = false
-                            trainingList = trainingScreenViewModel.currentMonthTrainings(
-                                months.indexOf(month)
-                            )
-                        }, text = { Text(month) })
-                    }
+                            trainingList =
+                                currentMonthTrainings(months.indexOf(month))
+                        }, text = { Text(month)}
+                    )
                 }
             }
         }
@@ -130,6 +122,7 @@ fun TrainingCardsItem(
                         .clip(RoundedCornerShape(16.dp))
                         .clickable(onClick = {
                             updateCurrentTrainings(item)
+                            Log.d("Doing",item.toString())
                             if (item.freeSpace>0)
                             changeVisibility()
                             else {
@@ -152,21 +145,15 @@ fun TrainingCardsItem(
                                 else Icons.Outlined.Circle,
                                 contentDescription = stringResource(R.string.icon_check)
                             )
-                            Text("Пн, 7 октября в 19:00") // Заменить на дату секций и время
+                            Text(item.date.toString())
                         }
                     }
                     Text(text = item.name, style = TextStyle(fontSize = 24.sp))
 
                     Row {
-                        Image(
-                            painter = painterResource(R.drawable.profile_image), // rememberAsyncImagePainter(image)
-                            contentDescription = null,
-                            modifier = Modifier.size(40.dp)
-                        )
                         Column {
                             Text(
-                                text = "Анна Владимирова",
-                                //text = item.teacher,
+                                text = item.trainerName,
                                 color = Color.Black,
                                 maxLines = 1,
                                 modifier = Modifier.fillMaxWidth(),
@@ -174,7 +161,7 @@ fun TrainingCardsItem(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = item.status.toString(),
+                                text = "1 ч",
                                 color = Color.Gray,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -183,7 +170,7 @@ fun TrainingCardsItem(
                         }
                     }
                     Text(
-                        text = "700 руб.",//text = item.price.toString(),
+                        text = "${item.price} ₽",
                         color = Color.Gray,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,

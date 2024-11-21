@@ -70,21 +70,22 @@ fun RegistrationScreen(
 ) {
 
     var textStateName by remember { mutableStateOf(TextFieldValue()) }
-    var textStateAge by remember { mutableStateOf(TextFieldValue()) }
     var textStatePhone by remember { mutableStateOf(TextFieldValue()) }
     var textStatePassword by remember { mutableStateOf(TextFieldValue()) }
+    var textStateDate by remember { mutableStateOf(TextFieldValue()) }
     var textStateReenterPassword by remember { mutableStateOf(TextFieldValue()) }
     val snackbarHostState = remember { SnackbarHostState() }
     var passwordVisible by remember { mutableStateOf(false) }
     var reenteredPasswordVisible by remember { mutableStateOf(false) }
 
+
     val scope = rememberCoroutineScope()
 
     var name by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var reenteredPassword by remember { mutableStateOf("") }
+    var date by remember { mutableStateOf("") }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -146,24 +147,6 @@ fun RegistrationScreen(
                 )
             )
             Spacer(modifier = Modifier.height(20.dp))
-            TextField(
-                value = textStateAge,
-                onValueChange = {
-                    textStateAge = it
-                    age = it.text.trim()
-                },
-                label = {
-                    Text(
-                        stringResource(id = R.string.age),
-                        color = Color.Black
-                    )
-                },
-                modifier = Modifier.padding(8.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number
-                )
-            )
-            Spacer(modifier = Modifier.height(20.dp))
 
             TextField(
                 value = textStatePhone,
@@ -180,10 +163,21 @@ fun RegistrationScreen(
                 modifier = Modifier.padding(8.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Phone,
-                    capitalization = KeyboardCapitalization.None // Можно установить в None для ввода номера телефона
+                    capitalization = KeyboardCapitalization.None
                 )
             )
             Spacer(modifier = Modifier.height(20.dp))
+            TextField(
+                value = textStateDate,
+                onValueChange = {
+                    textStateDate = it
+                    date = it.text.trim()
+                },
+                label = { Text(stringResource(R.string.birthday)) },
+                placeholder = { Text("ДД.ММ.ГГГГ") },
+                modifier = Modifier.padding(8.dp)
+
+            )
 
             TextField(
                 value = textStatePassword,
@@ -272,21 +266,20 @@ fun RegistrationScreen(
                         else {
                             CoroutineScope(Dispatchers.IO).launch {
                                 val containsPerson =
-                                    if (registrationViewModel.findPerson(phone) != null) {
-                                        true
-                                    } else false
+                                    registrationViewModel.findPerson(phone) != null
 
                                 if (!containsPerson) {
                                     val nameList = name.split(" ").toMutableList()
                                     if (nameList.size == 2) {
                                         nameList.add("")
                                     }
+                                    Log.d("Doing", date)
                                     val result = registrationViewModel.savePerson(
                                         name = nameList[1],
                                         surname = nameList[0],
                                         patronimic = nameList[2],
-                                        age = age.toInt(),
-                                        phone = phone, password
+                                        phone = phone, password,
+                                        birthday = date
                                     )
                                     Log.d("Doing", result.first.toString())
                                     if (result.first) {

@@ -1,6 +1,7 @@
 package com.example.danceclub.ui.screens.trainings
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.danceclub.data.local.AppDatabase
 import com.example.danceclub.data.local.dao.PersonsDao
 import com.example.danceclub.data.local.dao.TrainingDao
+import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.data.remote.DanceRepository
@@ -16,25 +18,33 @@ import kotlinx.coroutines.launch
 class TrainingScreenViewModel(application: Application) : AndroidViewModel(application) {
     private val personDao: PersonsDao = AppDatabase.getInstance(application).personsDao()
     private val trainingDao: TrainingDao = AppDatabase.getInstance(application).trainingsDao()
-    private val repository: DanceRepository = DanceRepository(personDao, trainingDao)
+    private val trainingSignDao: TrainingSignDao = AppDatabase.getInstance(application).trainingSignsDao()
+    private val repository: DanceRepository = DanceRepository(personDao, trainingDao, trainingSignDao)
     private val _trainings: MutableLiveData<List<Training>> = MutableLiveData(emptyList())
     val trainings: LiveData<List<Training>> get() = _trainings
     private val _currentTraining: MutableLiveData<Training> = MutableLiveData()
     val currentTraining: LiveData<Training> get() = _currentTraining
 
     init {
-        fetchAndStoreTrainings()
+        getTraining()
     }
 
     fun updateCurrentTrainings(newTraining: Training) {
         _currentTraining.postValue(newTraining)
+        Log.d("Doing",_currentTraining.value.toString())
     }
 
-    private fun fetchAndStoreTrainings() {
+    private fun getTraining() {
         viewModelScope.launch {
-            repository.fetchAndSaveTrainings()
-            updateTrainings()
+            val trainingList = trainingDao.getTrainingsSync()
+            _trainings.postValue(trainingList)
         }
+    }
+    fun getCurrentPerson():Person = repository.currentPerson
+
+    suspend fun singInTraining(person: String):String? {
+        return currentTraining.value?.let { repository.postSign(it,person) }
+
     }
 
     fun currentMonthTrainings(month: Int): List<Training>? {
@@ -49,12 +59,7 @@ class TrainingScreenViewModel(application: Application) : AndroidViewModel(appli
             }
         }
         return trainingWithMonth
+
     }
 
-    private fun updateTrainings() {
-        viewModelScope.launch {
-            val trainingList = trainingDao.getTrainingsSync()
-            _trainings.postValue(trainingList)
-        }
-    }
 }

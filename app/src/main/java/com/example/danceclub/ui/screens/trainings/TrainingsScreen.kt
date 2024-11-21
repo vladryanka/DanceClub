@@ -99,10 +99,15 @@ fun TrainingsScreen(
 
         when (isItem1Visible.value) {
             true -> {
+
                 val currentTraining = trainingScreenViewModel.currentTraining.value
                 if (currentTraining != null)
                     DetailItem(
-                        contentPadding, currentTraining, ::changeVisibility
+                        contentPadding,
+                        currentTraining, ::changeVisibility,
+                        trainingScreenViewModel::singInTraining,
+                        trainingScreenViewModel.getCurrentPerson().id
+
                     )
             }
 
@@ -111,7 +116,7 @@ fun TrainingsScreen(
                     contentPadding,
                     trainingScreenViewModel::updateCurrentTrainings,
                     ::changeVisibility,
-                    trainingScreenViewModel
+                    trainingScreenViewModel::currentMonthTrainings
                 )
             }
         }

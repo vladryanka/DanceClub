@@ -57,7 +57,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-//TODO добавить пост картинки
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(
@@ -206,8 +205,8 @@ fun SignInScreen(
                     textAlign = TextAlign.Center, style = TextStyle(fontSize = 24.sp)
                 )
             }
-
         }
+
     }
 }
 

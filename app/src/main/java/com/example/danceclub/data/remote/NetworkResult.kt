@@ -36,10 +36,10 @@ suspend fun <T : Any> handleApi(
             }
         }
     } catch (e: HttpException) {
-        Log.d("Doing", e.message().toString())
+        Log.d("Doing", "HttpException" +e.message().toString())
         NetworkResult.Error(e.code(), e.message())
     } catch (e: Throwable) {
-        Log.d("Doing",e.toString())
+        Log.d("Doing","Throwable" +e.toString())
         NetworkResult.Exception(e)
     }
 }
