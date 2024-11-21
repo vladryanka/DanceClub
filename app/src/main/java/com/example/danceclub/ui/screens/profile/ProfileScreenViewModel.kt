@@ -14,37 +14,40 @@ import com.example.danceclub.data.local.dao.TrainingDao
 import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.model.Token
 import com.example.danceclub.data.model.Training
-import com.example.danceclub.data.remote.DanceRepository
+import com.example.danceclub.data.remote.RepositoryProvider
 import kotlinx.coroutines.launch
 
-class ProfileScreenViewModel (application: Application) : AndroidViewModel(application) {
+class ProfileScreenViewModel(application: Application) : AndroidViewModel(application) {
     private val personDao: PersonsDao = AppDatabase.getInstance(application).personsDao()
     private val trainingDao: TrainingDao = AppDatabase.getInstance(application).trainingsDao()
-    private val trainingSignDao: TrainingSignDao = AppDatabase.getInstance(application).trainingSignsDao()
-    private val repository: DanceRepository = DanceRepository(personDao, trainingDao, trainingSignDao)
+    private val trainingSignDao: TrainingSignDao =
+        AppDatabase.getInstance(application).trainingSignsDao()
+    private val repository = RepositoryProvider.getRepository()
     private val _trainings: MutableLiveData<List<Training>> = MutableLiveData(emptyList())
     private val _savedImage: MutableLiveData<Boolean> = MutableLiveData(false)
     val trainings: LiveData<List<Training>> get() = _trainings
-    val savedImage: LiveData<Boolean>  get() = _savedImage
+    val savedImage: LiveData<Boolean> get() = _savedImage
 
     init {
         fetchAndStoreTrainings()
     }
 
-    fun getToken():Token {
+    fun getToken(): Token {
         return repository.token
     }
 
-     fun saveImage(image:Uri, contentResolver: ContentResolver){
-         viewModelScope.launch {
-             val result = repository.putImage(image,contentResolver)
-             if (result == "1") _savedImage.postValue(true)
-             else _savedImage.postValue(false)
-             result?.let {  Log.d("Doing", result)
-             }
-         }
-    }
+    suspend fun saveImage(image: Uri, contentResolver: ContentResolver) {
+        Log.d("Doing", "Пришли в saveImage")
 
+        val result = repository.putImage(image, contentResolver)
+
+        if (result == "1") _savedImage.postValue(true)
+        else _savedImage.postValue(false)
+        result?.let {
+            Log.d("Doing", result)
+        }
+
+    }
 
 
     private fun fetchAndStoreTrainings() {
@@ -53,14 +56,16 @@ class ProfileScreenViewModel (application: Application) : AndroidViewModel(appli
             updateTrainings()
         }
     }
+
     private fun updateTrainings() {
         viewModelScope.launch {
             val trainingList = trainingDao.getTrainingsSync()
             _trainings.postValue(trainingList)
         }
     }
-    fun getTrainingSign(){
-        // TODO добавить запись пользователя
+
+    fun getTrainingSign() {
+        repository.getSignedTrainings()
     }
 
 }

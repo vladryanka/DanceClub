@@ -11,6 +11,7 @@ import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Token
 import com.example.danceclub.data.model.Training
+import com.example.danceclub.data.model.TrainingSign
 import com.example.danceclub.data.request.LoginRequest
 import com.example.danceclub.data.request.RegisterRequest
 import com.fasterxml.jackson.databind.JsonNode
@@ -53,14 +54,14 @@ class DanceRepository(
         }
     }
 
-    suspend fun postSign(training: Training, person: String):String?{
-        getCurrentAccessToken()
-        val response = apiService.addSign(token.accessToken,training.id)
+    suspend fun postSign(training: Training, personId: String):String?{
+        Log.d("Doing", token.toString())
+        val response = apiService.addSign("Bearer ${token.accessToken}",training.id)
         val result = handleApi { response }
         var errorType: String? = null
         when (result) {
             is NetworkResult.Success -> {
-                trainingSignDao.add(training.id, person)
+                trainingSignDao.add(TrainingSign(trainingId = training.id, personId = personId))
             }
 
             is NetworkResult.Error -> {
@@ -110,7 +111,7 @@ class DanceRepository(
                 if (expRefresh != null) { // Токен RefreshToken истек
                     if (isTokenExpired(expRefresh)) {
                         CoroutineScope(Dispatchers.IO).launch() {
-                            val newToken = apiService.newTokens("Bearer $token.refreshToken")
+                            val newToken = apiService.newTokens("Bearer ${token.refreshToken}")
                             token = newToken.body()?.let {
                                 Token(
                                     accessToken = it.accessToken,
@@ -122,7 +123,7 @@ class DanceRepository(
 
                 } else {
                     CoroutineScope(Dispatchers.IO).launch() {
-                        val newAccessToken = apiService.newAccessToken("Bearer $token.refreshToken")
+                        val newAccessToken = apiService.newAccessToken("Bearer ${token.refreshToken}")
                         token = newAccessToken.body()?.let {
                             Token(
                                 accessToken = it.accessToken,
@@ -143,9 +144,11 @@ class DanceRepository(
 
         when (result) {
             is NetworkResult.Success -> {
-                token = result.data // Инициализируем token
-                personDao.searchPerson(phone)?.let { currentPerson = it }
+                token = result.data.tokens // Инициализируем token
+                Log.d("Doing", token.toString())
+                currentPerson = result.data.person
                 getCurrentAccessToken()
+                Log.d("Doing", token.toString())
             }
 
             is NetworkResult.Error -> {
@@ -167,7 +170,7 @@ class DanceRepository(
         var errorType: String? = null
         if (imageString != null) {
             getCurrentAccessToken()
-            val response = apiService.putImage(token.accessToken, imageString)
+            val response = apiService.putImage("Bearer ${token.accessToken}", imageString)
             val result = handleApi { response }
             when (result) {
                 is NetworkResult.Success -> {
@@ -262,12 +265,14 @@ class DanceRepository(
     }
 
     suspend fun fetchAndSaveSignedTrainings() { // TODO
-        val trainingSignedResponse = apiService.loadSignedTrainingResponse().trainings
-        val trainingList = trainingSignDao.getTrainingsSync()
+        val trainingSignedResponse = apiService.loadSignedTrainingResponse().trainings ?: return
+        val trainingList = trainingSignDao.getTrainingSignsSync()
         withContext(Dispatchers.IO) {
-            for (training in trainingSignedResponse!!) {
-                if (!trainingList.contains(training)) {
-                    trainingDao.add(training)
+            val existingTrainingIds = trainingList.map { it.trainingId }.toSet()
+
+            for (training in trainingSignedResponse) {
+                if (!existingTrainingIds.contains(training.id)) {
+                    trainingSignDao.add(TrainingSign(currentPerson.id, training.id))
                 }
             }
             Log.d("Doing", "getTrainingsSync = " + trainingList.toString())
@@ -276,7 +281,6 @@ class DanceRepository(
 
     suspend fun fetchAndSaveTrainings() {
         val trainingResponse = apiService.loadTrainingsResponse().trainings
-        Log.d("Doing", "trainingResponse = " + trainingResponse.toString())
         val trainingList = trainingDao.getTrainingsSync()
         withContext(Dispatchers.IO) {
             for (training in trainingResponse!!) {
@@ -284,7 +288,6 @@ class DanceRepository(
                     trainingDao.add(training)
                 }
             }
-            Log.d("Doing", "getTrainingsSync = " + trainingList.toString())
         }
     }
 

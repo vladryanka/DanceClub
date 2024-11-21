@@ -6,11 +6,11 @@ import androidx.room.Insert
 import androidx.room.Query
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
+import com.example.danceclub.data.model.TrainingSign
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrainingDao {
-
     @Query("SELECT * FROM training")
     fun getTrainings(): Flow<List<Training>>
 
@@ -22,6 +22,7 @@ interface TrainingDao {
 
     @Insert
     fun add(training: Training)
+
 
     // TODO: тут не все, что умеет делать секция
 }

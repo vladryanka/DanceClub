@@ -3,22 +3,22 @@ package com.example.danceclub.data.local.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.danceclub.data.model.Training
+import com.example.danceclub.data.model.TrainingSign
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrainingSignDao {
 
-    @Query("SELECT * FROM training")
-    fun getSignedTrainings(): Flow<List<Training>>
+    @Query("SELECT * FROM training_sign")
+    fun getTrainings(): Flow<List<TrainingSign>>
 
-    @Query("SELECT * FROM training WHERE id = :id LIMIT 1")
-    fun getById(id: String): Training?
+    @Query("SELECT * FROM training_sign WHERE personId = :trainingId LIMIT 1")
+    fun getById(trainingId: String): TrainingSign?
 
-    @Query("SELECT * FROM training")
-    suspend fun getTrainingsSync(): List<Training>
+    @Query("SELECT * FROM training_sign")
+    suspend fun getTrainingSignsSync(): List<TrainingSign>
 
     @Insert
-    fun add(trainingId: String, personId: String)
+    fun add(trainingSign: TrainingSign)
 
 }

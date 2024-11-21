@@ -7,7 +7,7 @@ import com.example.danceclub.data.local.dao.PersonsDao
 import com.example.danceclub.data.local.dao.TrainingDao
 import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.model.Person
-import com.example.danceclub.data.remote.DanceRepository
+import com.example.danceclub.data.remote.RepositoryProvider
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -16,7 +16,7 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
     private val personDao: PersonsDao = AppDatabase.getInstance(application).personsDao()
     private val trainingDao: TrainingDao = AppDatabase.getInstance(application).trainingsDao()
     private val trainingSignDao: TrainingSignDao = AppDatabase.getInstance(application).trainingSignsDao()
-    private val repository: DanceRepository = DanceRepository(personDao, trainingDao, trainingSignDao)
+    private val repository = RepositoryProvider.getRepository()
 
     fun findPerson(phone: String): Person? {
         return personDao.searchPerson(phone)

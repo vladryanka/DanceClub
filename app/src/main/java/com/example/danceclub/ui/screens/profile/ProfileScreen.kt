@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,9 +47,9 @@ import com.example.danceclub.R
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @Composable
@@ -59,19 +60,23 @@ fun ProfileScreen(
 ) {
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     val context = LocalContext.current
     val getContent = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        selectedImageUri = uri
-        selectedImageUri?.let {
-            CoroutineScope(Dispatchers.IO).launch {
-                viewModel.saveImage(it, context.contentResolver)
+        uri?.let {
+            selectedImageUri = it
+            coroutineScope.launch {
+                withContext(Dispatchers.IO) {
+                    viewModel.saveImage(it, context.contentResolver)
+                }
             }
         }
     }
+
+    val signedTrainingList = viewModel.getTrainingSign()
 
 
     Column(

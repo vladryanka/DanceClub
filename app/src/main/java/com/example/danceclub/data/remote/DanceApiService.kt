@@ -1,10 +1,14 @@
 package com.example.danceclub.data.remote
 
+import com.example.danceclub.data.local.dao.PersonsDao
+import com.example.danceclub.data.local.dao.TrainingDao
+import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.request.LoginRequest
 import com.example.danceclub.data.request.RegisterRequest
 import com.example.danceclub.data.response.RegistrationResponse
 import com.example.danceclub.data.model.Token
 import com.example.danceclub.data.model.Training
+import com.example.danceclub.data.response.LoginResponse
 import com.example.danceclub.data.response.PersonResponse
 import com.example.danceclub.data.response.TrainingResponse
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -20,6 +24,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Query
+import java.util.concurrent.TimeUnit
 
 private const val BASE_URL: String = "https://mega-prod.ru/"
 
@@ -32,6 +37,9 @@ val json = Json {
 
 private val okHttpClient = OkHttpClient.Builder()
     .addInterceptor(interceptor)
+    .connectTimeout(60, TimeUnit.SECONDS) // Увеличение времени ожидания подключения
+    .readTimeout(60, TimeUnit.SECONDS)     // Увеличение времени ожидания чтения
+    .writeTimeout(60, TimeUnit.SECONDS)
     .build()
 
 private val retrofit: Retrofit = Retrofit.Builder()
@@ -58,7 +66,7 @@ interface DanceApiService {
     @POST("auth/login")
     suspend fun login(
         @Body loginRequest: LoginRequest
-    ): Response<Token>
+    ): Response<LoginResponse>
 
     @POST("auth/newTokens")
     suspend fun newTokens(@Header("Authorization") bearerToken: String): Response<Token>
@@ -87,7 +95,7 @@ interface DanceApiService {
     @PUT("person/picture")
     suspend fun putImage(
         @Header("Authorization") bearerToken: String,
-        @Query("image")image: String
+        @Body image: String
     ):Response<Void>
 
     @GET("person/picture")
@@ -99,5 +107,21 @@ interface DanceApiService {
 object DanceApi {
     val retrofitService: DanceApiService by lazy {
         retrofit.create(DanceApiService::class.java)
+    }
+}
+
+object RepositoryProvider {
+
+    private lateinit var repository: DanceRepository
+
+    fun initialize(personsDao: PersonsDao, trainingDao: TrainingDao, trainingSignDao: TrainingSignDao) {
+        repository = DanceRepository(personsDao, trainingDao, trainingSignDao)
+    }
+
+    fun getRepository(): DanceRepository {
+        if (!::repository.isInitialized) {
+            throw IllegalStateException("Repository is not initialized. Call initialize() first.")
+        }
+        return repository
     }
 }

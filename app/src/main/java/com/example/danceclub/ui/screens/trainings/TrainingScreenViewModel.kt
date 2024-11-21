@@ -12,14 +12,14 @@ import com.example.danceclub.data.local.dao.TrainingDao
 import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
-import com.example.danceclub.data.remote.DanceRepository
+import com.example.danceclub.data.remote.RepositoryProvider
 import kotlinx.coroutines.launch
 
 class TrainingScreenViewModel(application: Application) : AndroidViewModel(application) {
     private val personDao: PersonsDao = AppDatabase.getInstance(application).personsDao()
     private val trainingDao: TrainingDao = AppDatabase.getInstance(application).trainingsDao()
     private val trainingSignDao: TrainingSignDao = AppDatabase.getInstance(application).trainingSignsDao()
-    private val repository: DanceRepository = DanceRepository(personDao, trainingDao, trainingSignDao)
+    private val repository = RepositoryProvider.getRepository()
     private val _trainings: MutableLiveData<List<Training>> = MutableLiveData(emptyList())
     val trainings: LiveData<List<Training>> get() = _trainings
     private val _currentTraining: MutableLiveData<Training> = MutableLiveData()

@@ -76,13 +76,13 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)
     implementation(libs.okhttp)
-    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    implementation(libs.logging.interceptor)
     implementation(libs.accompanist.swiperefresh)
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.0.1")
+    implementation(libs.jackson.databind)
 
     //Pictures
     implementation(libs.coil.compose)
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation (libs.glide)
 
     //Room
     implementation(libs.androidx.room.runtime)
