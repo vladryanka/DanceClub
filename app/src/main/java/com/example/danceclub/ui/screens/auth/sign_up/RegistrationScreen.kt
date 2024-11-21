@@ -1,5 +1,6 @@
 package com.example.danceclub.ui.screens.auth.sign_up
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -29,7 +30,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +58,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.UUID
 
 // добавить проверку на номер телефона. если уже есть в бд - нельзя зарегистрироваться!
 
@@ -69,28 +68,24 @@ fun RegistrationScreen(
     onNavigateToProfile: (Person) -> Unit,
     onNavigateUpToGreeting: () -> Unit,
 ) {
-    var personList:List<Person>? = emptyList()
 
-    LaunchedEffect(Unit) {
-        registrationViewModel.fetchAndStorePersons()
-        personList = registrationViewModel.getPersons().value
-    }
     var textStateName by remember { mutableStateOf(TextFieldValue()) }
-    var textStateAge by remember { mutableStateOf(TextFieldValue()) }
     var textStatePhone by remember { mutableStateOf(TextFieldValue()) }
     var textStatePassword by remember { mutableStateOf(TextFieldValue()) }
+    var textStateDate by remember { mutableStateOf(TextFieldValue()) }
     var textStateReenterPassword by remember { mutableStateOf(TextFieldValue()) }
     val snackbarHostState = remember { SnackbarHostState() }
     var passwordVisible by remember { mutableStateOf(false) }
     var reenteredPasswordVisible by remember { mutableStateOf(false) }
 
+
     val scope = rememberCoroutineScope()
 
     var name by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var reenteredPassword by remember { mutableStateOf("") }
+    var date by remember { mutableStateOf("") }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -152,24 +147,6 @@ fun RegistrationScreen(
                 )
             )
             Spacer(modifier = Modifier.height(20.dp))
-            TextField(
-                value = textStateAge,
-                onValueChange = {
-                    textStateAge = it
-                    age = it.text.trim()
-                },
-                label = {
-                    Text(
-                        stringResource(id = R.string.age),
-                        color = Color.Black
-                    )
-                },
-                modifier = Modifier.padding(8.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number
-                )
-            )
-            Spacer(modifier = Modifier.height(20.dp))
 
             TextField(
                 value = textStatePhone,
@@ -186,10 +163,21 @@ fun RegistrationScreen(
                 modifier = Modifier.padding(8.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Phone,
-                    capitalization = KeyboardCapitalization.None // Можно установить в None для ввода номера телефона
+                    capitalization = KeyboardCapitalization.None
                 )
             )
             Spacer(modifier = Modifier.height(20.dp))
+            TextField(
+                value = textStateDate,
+                onValueChange = {
+                    textStateDate = it
+                    date = it.text.trim()
+                },
+                label = { Text(stringResource(R.string.birthday)) },
+                placeholder = { Text("ДД.ММ.ГГГГ") },
+                modifier = Modifier.padding(8.dp)
+
+            )
 
             TextField(
                 value = textStatePassword,
@@ -277,28 +265,49 @@ fun RegistrationScreen(
                             }
                         else {
                             CoroutineScope(Dispatchers.IO).launch {
-                                val containsPerson = personList?.any { it.phone == phone }
+                                val containsPerson =
+                                    registrationViewModel.findPerson(phone) != null
 
-                                if (containsPerson == false) {
+                                if (!containsPerson) {
                                     val nameList = name.split(" ").toMutableList()
-                                    if (nameList.size == 2)
-                                    {
-                                        nameList.add(" ")
+                                    if (nameList.size == 2) {
+                                        nameList.add("")
                                     }
-                                    val person = Person(
-                                        id = UUID.randomUUID().toString(),
+                                    Log.d("Doing", date)
+                                    val result = registrationViewModel.savePerson(
                                         name = nameList[1],
                                         surname = nameList[0],
-                                        //password = password,
                                         patronimic = nameList[2],
-                                        age = age.toInt(),
-                                        phone = phone
+                                        phone = phone, password,
+                                        birthday = date
                                     )
-                                    registrationViewModel.savePerson(
-                                        person
-                                    )
-                                    withContext(Dispatchers.Main) {
-                                        onNavigateToProfile(person)
+                                    Log.d("Doing", result.first.toString())
+                                    if (result.first) {
+                                        val personForNav = registrationViewModel.findPerson(phone)
+                                        personForNav?.let {
+                                            Log.d(
+                                                "Doing",
+                                                personForNav.toString()
+                                            )
+                                        }
+                                        withContext(Dispatchers.Main) {
+                                            personForNav?.let { onNavigateToProfile(personForNav) }
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(
+                                                    "Пользователь не найден",
+                                                    withDismissAction = true,
+                                                    duration = SnackbarDuration.Short
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                result.second,
+                                                withDismissAction = true,
+                                                duration = SnackbarDuration.Short
+                                            )
+                                        }
                                     }
                                 } else {
                                     scope.launch {

@@ -76,9 +76,13 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)
     implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
     implementation(libs.accompanist.swiperefresh)
+    implementation(libs.jackson.databind)
 
+    //Pictures
     implementation(libs.coil.compose)
+    implementation (libs.glide)
 
     //Room
     implementation(libs.androidx.room.runtime)

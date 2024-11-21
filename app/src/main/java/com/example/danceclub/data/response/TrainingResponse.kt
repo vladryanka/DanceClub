@@ -1,4 +1,4 @@
-package com.example.danceclub.data.remote
+package com.example.danceclub.data.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -40,9 +40,9 @@ fun TrainingsScreen(
     onNavigateUpToProfile: () -> Unit
 ) {
 
+
     BackHandler { onNavigateUpToProfile() }
     val isItem1Visible = remember { mutableStateOf(false) }
-    val trainingList = trainingScreenViewModel.trainings.value
     fun changeVisibility() {
         isItem1Visible.value = !isItem1Visible.value
     }
@@ -99,18 +99,24 @@ fun TrainingsScreen(
 
         when (isItem1Visible.value) {
             true -> {
+
                 val currentTraining = trainingScreenViewModel.currentTraining.value
                 if (currentTraining != null)
                     DetailItem(
-                        contentPadding, currentTraining, ::changeVisibility
+                        contentPadding,
+                        currentTraining, ::changeVisibility,
+                        trainingScreenViewModel::singInTraining,
+                        trainingScreenViewModel.getCurrentPerson().id
+
                     )
             }
 
             false -> {
                 TrainingCardsItem(
                     contentPadding,
-                    trainingList,
-                    trainingScreenViewModel::updateCurrentTrainings, ::changeVisibility
+                    trainingScreenViewModel::updateCurrentTrainings,
+                    ::changeVisibility,
+                    trainingScreenViewModel::currentMonthTrainings
                 )
             }
         }

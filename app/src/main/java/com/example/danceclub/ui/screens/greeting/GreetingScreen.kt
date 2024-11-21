@@ -24,7 +24,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.danceclub.R
+import com.example.danceclub.ui.screens.auth.sing_in.SignInViewModel
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
 
@@ -33,6 +35,7 @@ import com.example.danceclub.ui.utils.PreviewLightDark
 fun GreetingScreen(
     onNavigateToSignIn: () -> Unit,
     onNavigateToRegistration: () -> Unit,
+    greetingViewModel: GreetingViewModel = viewModel()
 ) {
     Scaffold(
         topBar = {

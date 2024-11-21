@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.example.danceclub.data.local.converters.Converters
 import com.example.danceclub.data.local.serializer.LocalDateSerializer
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 import java.util.UUID
@@ -32,5 +31,11 @@ data class Training(
     @ColumnInfo(name = "space")
     val space: Int = 0,
     @ColumnInfo(name = "freeSpace")
-    val freeSpace: Int = 0
+    val freeSpace: Int = 0,
+    @ColumnInfo(name = "price")
+    val price: Int,
+    @ColumnInfo(name = "trainerName")
+    val trainerName: String,
+    @ColumnInfo(name = "trainerDescriptions")
+    val trainerDescriptions: String
 )

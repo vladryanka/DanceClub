@@ -170,30 +170,31 @@ fun SignInScreen(
             Button(
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
-                        val person = authorizationViewModel.findPerson(phone)
+                        val response = authorizationViewModel.login(phone, password)
 
-                        if (person == null) {
-                            withContext(Dispatchers.Main) {
-                                snackbarHostState.showSnackbar(
-                                    "Введен некорректный телефон",
-                                    withDismissAction = true,
-                                    duration = SnackbarDuration.Short
-                                )
-                            }
-                        } else {/*
-                           if (person.password != password) {
+                        if (response.first) {
+                            val person = authorizationViewModel.findPerson(phone)
+                            if (person != null)
+                                withContext(Dispatchers.Main) {
+                                    onNavigateToProfile(person)
+                                }
+                            else
                                 withContext(Dispatchers.Main) {
                                     snackbarHostState.showSnackbar(
-                                        "Введен некорректный пароль",
+                                        "Пользователь не зарегистрирован",
                                         withDismissAction = true,
                                         duration = SnackbarDuration.Short
                                     )
                                 }
-                            } else {*/
+
+                        } else {
                             withContext(Dispatchers.Main) {
-                                onNavigateToProfile(person)
+                                snackbarHostState.showSnackbar(
+                                    response.second,
+                                    withDismissAction = true,
+                                    duration = SnackbarDuration.Short
+                                )
                             }
-                            //}
                         }
                     }
                 },
@@ -204,8 +205,8 @@ fun SignInScreen(
                     textAlign = TextAlign.Center, style = TextStyle(fontSize = 24.sp)
                 )
             }
-
         }
+
     }
 }
 
