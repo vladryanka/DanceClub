@@ -139,9 +139,7 @@ fun ProfileScreen(
         ) {
 
             Image(
-                painter = rememberAsyncImagePainter(
-                    painter
-                ),
+                painter = painterResource(id = R.drawable.profile_image),
                 contentDescription = "Profile Image",
                 modifier = Modifier
                     .size(160.dp)

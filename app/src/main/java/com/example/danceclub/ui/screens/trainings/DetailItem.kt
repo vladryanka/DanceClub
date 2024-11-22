@@ -14,6 +14,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +43,11 @@ fun DetailItem(
 ) {
     BackHandler { changeVisibility() }
     val snackbarHostState = remember { SnackbarHostState() }
+    Log.d("Doing", isSignedInResult.toString())
     var isSignedIn by remember { mutableStateOf(isSignedInResult) }
+    LaunchedEffect(isSignedInResult) {
+        isSignedIn = isSignedInResult
+    }
 
     Column(
         modifier = Modifier
@@ -150,7 +155,9 @@ fun DetailItem(
             }
 
         }) {
+            Log.d("Doing", " внутри кнопки "+isSignedIn.toString())
             Text(
+
                 if (isSignedIn) "Вы записаны" else "Записаться",
                 color = Color.Black, textAlign = TextAlign.Center,
                 style = TextStyle(fontSize = 24.sp)

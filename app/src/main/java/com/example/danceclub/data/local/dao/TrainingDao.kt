@@ -23,6 +23,6 @@ interface TrainingDao {
     @Insert
     fun add(training: Training)
 
-
-    // TODO: тут не все, что умеет делать секция
+    @Query("UPDATE training SET status = 1, freeSpace = freeSpace - 1 WHERE id = :id")
+    suspend fun updateTrainingStatusAndFreeSpace(id: String)
 }
