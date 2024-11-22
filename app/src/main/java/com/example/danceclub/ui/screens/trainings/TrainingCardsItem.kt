@@ -48,7 +48,6 @@ import com.example.danceclub.data.model.Training
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-// TODO: Добавить фильтр по месяцу
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +55,7 @@ fun TrainingCardsItem(
     contentPadding: PaddingValues,
     updateCurrentTrainings: (Training) -> Unit,
     changeVisibility: () -> Unit,
-    currentMonthTrainings: (Int) -> List<Training>?,
+    currentMonthTrainings: (Int) -> List<Training>?
 ) {
     val months = listOf(
         "Все", "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
@@ -70,7 +69,8 @@ fun TrainingCardsItem(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var trainingList = currentMonthTrainings(LocalDate.now().monthValue)
+    //var trainingList = currentMonthTrainings(LocalDate.now().monthValue)
+    var trainingList by remember { mutableStateOf(currentMonthTrainings(LocalDate.now().monthValue)) }
 
     Column(
         modifier = Modifier
@@ -100,79 +100,87 @@ fun TrainingCardsItem(
                         onClick = {
                             selectedMonth = month
                             trainingList = currentMonthTrainings(months.indexOf(month))
+                            Log.d("Doing", trainingList.toString())
                             expanded = false
                         },
                     )
                 }
             }
         }
+        if (trainingList?.isEmpty() == true) {
+            Text(
+                text = "Нет тренировок на выбранный месяц", modifier = Modifier.padding(8.dp),
+                style = TextStyle(fontSize = 16.sp)
+            )
+        } else {
 
-        LazyColumn(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(16.dp)
-        ) {
-            itemsIndexed(trainingList ?: emptyList()) { _, item ->
-                Column(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .background(Color.LightGray)
-                        .clip(RoundedCornerShape(16.dp))
-                        .clickable(onClick = {
-                            updateCurrentTrainings(item)
-                            Log.d("Doing", item.toString())
-                            if (item.freeSpace > 0)
-                                changeVisibility()
-                            else {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        "Свободных мест нет",
-                                        withDismissAction = true,
-                                        duration = SnackbarDuration.Short
-                                    )
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                itemsIndexed(trainingList ?: emptyList()) { _, item ->
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .background(Color.LightGray)
+                            .clip(RoundedCornerShape(16.dp))
+                            .clickable(onClick = {
+                                updateCurrentTrainings(item)
+                                Log.d("Doing", item.toString())
+                                if (item.freeSpace > 0)
+                                    changeVisibility()
+                                else {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            "Свободных мест нет",
+                                            withDismissAction = true,
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
                                 }
+                            })
+
+                    ) {
+                        Card {
+                            Row {
+                                Icon(
+                                    imageVector = if (isChecked)
+                                        Icons.Default.CheckCircle
+                                    else Icons.Outlined.Circle,
+                                    contentDescription = stringResource(R.string.icon_check)
+                                )
+                                Text(item.date.toString())
                             }
-                        })
+                        }
+                        Text(text = item.name, style = TextStyle(fontSize = 24.sp))
 
-                ) {
-                    Card {
                         Row {
-                            Icon(
-                                imageVector = if (isChecked)
-                                    Icons.Default.CheckCircle
-                                else Icons.Outlined.Circle,
-                                contentDescription = stringResource(R.string.icon_check)
-                            )
-                            Text(item.date.toString())
+                            Column {
+                                Text(
+                                    text = item.trainerName,
+                                    color = Color.Black,
+                                    maxLines = 1,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    style = TextStyle(fontSize = 24.sp)
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "1 ч",
+                                    color = Color.Gray,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = TextStyle(fontSize = 16.sp)
+                                )
+                            }
                         }
+                        Text(
+                            text = "${item.price} ₽",
+                            color = Color.Gray,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = TextStyle(fontSize = 16.sp)
+                        )
                     }
-                    Text(text = item.name, style = TextStyle(fontSize = 24.sp))
-
-                    Row {
-                        Column {
-                            Text(
-                                text = item.trainerName,
-                                color = Color.Black,
-                                maxLines = 1,
-                                modifier = Modifier.fillMaxWidth(),
-                                style = TextStyle(fontSize = 24.sp)
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "1 ч",
-                                color = Color.Gray,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                style = TextStyle(fontSize = 16.sp)
-                            )
-                        }
-                    }
-                    Text(
-                        text = "${item.price} ₽",
-                        color = Color.Gray,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = TextStyle(fontSize = 16.sp)
-                    )
                 }
             }
         }

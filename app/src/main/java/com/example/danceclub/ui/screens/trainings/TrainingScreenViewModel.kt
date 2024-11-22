@@ -13,12 +13,16 @@ import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.data.remote.RepositoryProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 class TrainingScreenViewModel(application: Application) : AndroidViewModel(application) {
     private val personDao: PersonsDao = AppDatabase.getInstance(application).personsDao()
     private val trainingDao: TrainingDao = AppDatabase.getInstance(application).trainingsDao()
-    private val trainingSignDao: TrainingSignDao = AppDatabase.getInstance(application).trainingSignsDao()
+    private val trainingSignDao: TrainingSignDao =
+        AppDatabase.getInstance(application).trainingSignsDao()
     private val repository = RepositoryProvider.getRepository()
     private val _trainings: MutableLiveData<List<Training>> = MutableLiveData(emptyList())
     val trainings: LiveData<List<Training>> get() = _trainings
@@ -27,31 +31,43 @@ class TrainingScreenViewModel(application: Application) : AndroidViewModel(appli
 
     init {
         getTraining()
+        Log.d("Doing", LocalDate.now().monthValue.toString())
+        currentMonthTrainings(LocalDate.now().monthValue)
     }
 
     fun updateCurrentTrainings(newTraining: Training) {
         _currentTraining.postValue(newTraining)
-        Log.d("Doing",_currentTraining.value.toString())
+        Log.d("Doing", _currentTraining.value.toString())
     }
 
     private fun getTraining() {
         viewModelScope.launch {
             val trainingList = trainingDao.getTrainingsSync()
             _trainings.postValue(trainingList)
+            if (trainingList.isNotEmpty()) {
+                _currentTraining.postValue(trainingList[0])
+            }
         }
     }
-    fun getCurrentPerson():Person = repository.currentPerson
 
-    suspend fun singInTraining(person: String):String? {
-        return currentTraining.value?.let { repository.postSign(it,person) }
+    fun getCurrentPerson(): Person = repository.currentPerson
 
+    suspend fun singInTraining(person: String): String? {
+        return repository.postSign(currentTraining.value!!, person)
     }
 
-    fun currentMonthTrainings(month: Int): List<Training>? {
+    suspend fun isSignedIn(trainingId: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            trainingSignDao.getById(trainingId) != null
+        }
+    }
+
+    fun currentMonthTrainings(month: Int):List<Training>? {
         val trainingList = trainings.value
         val trainingWithMonth: MutableList<Training> = mutableListOf()
-        if (month == 0)
+        if (month == 0) {
             return trainingList
+        }
         if (trainingList != null) {
             for (i in trainingList) {
                 if (i.date.monthValue == month)
@@ -59,7 +75,6 @@ class TrainingScreenViewModel(application: Application) : AndroidViewModel(appli
             }
         }
         return trainingWithMonth
-
     }
 
 }

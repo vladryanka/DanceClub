@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,7 @@ fun TrainingsScreen(
     fun changeVisibility() {
         isItem1Visible = !isItem1Visible
     }
+    var isSignedIn by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -99,16 +101,24 @@ fun TrainingsScreen(
 
         when (isItem1Visible) {
             true -> {
-
                 val currentTraining = trainingScreenViewModel.currentTraining.value
-                if (currentTraining != null)
+
+                LaunchedEffect(currentTraining) {
+                    if (currentTraining != null) {
+                        isSignedIn = trainingScreenViewModel.isSignedIn(trainingScreenViewModel.getCurrentPerson().id)
+                    }
+                }
+
+                if (currentTraining != null) {
                     DetailItem(
                         contentPadding,
-                        currentTraining, ::changeVisibility,
+                        currentTraining,
+                        ::changeVisibility,
                         trainingScreenViewModel::singInTraining,
-                        trainingScreenViewModel.getCurrentPerson().id
-
+                        trainingScreenViewModel.getCurrentPerson().id,
+                        isSignedIn
                     )
+                }
             }
 
             false -> {

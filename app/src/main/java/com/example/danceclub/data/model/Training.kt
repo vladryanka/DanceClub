@@ -15,7 +15,7 @@ import java.util.UUID
 data class Training(
 
     @ColumnInfo(name = "id")
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = false)
     val id: String = UUID.randomUUID().toString(),
 
     @ColumnInfo(name = "name")

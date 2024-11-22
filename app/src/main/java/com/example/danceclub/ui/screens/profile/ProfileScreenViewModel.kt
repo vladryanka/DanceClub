@@ -2,7 +2,10 @@ package com.example.danceclub.ui.screens.profile
 
 import android.app.Application
 import android.content.ContentResolver
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -14,8 +17,11 @@ import com.example.danceclub.data.local.dao.TrainingDao
 import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.model.Token
 import com.example.danceclub.data.model.Training
+import com.example.danceclub.data.model.TrainingSign
 import com.example.danceclub.data.remote.RepositoryProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ProfileScreenViewModel(application: Application) : AndroidViewModel(application) {
     private val personDao: PersonsDao = AppDatabase.getInstance(application).personsDao()
@@ -24,8 +30,11 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
         AppDatabase.getInstance(application).trainingSignsDao()
     private val repository = RepositoryProvider.getRepository()
     private val _trainings: MutableLiveData<List<Training>> = MutableLiveData(emptyList())
+    private val _trainingSigns: MutableLiveData<List<TrainingSign>> = MutableLiveData(emptyList())
     private val _savedImage: MutableLiveData<Boolean> = MutableLiveData(false)
     val trainings: LiveData<List<Training>> get() = _trainings
+    val trainingSign: LiveData<List<TrainingSign>> get() = _trainingSigns
+
     val savedImage: LiveData<Boolean> get() = _savedImage
 
     init {
@@ -36,23 +45,52 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
         return repository.token
     }
 
-    suspend fun saveImage(image: Uri, contentResolver: ContentResolver) {
-        Log.d("Doing", "Пришли в saveImage")
+    private fun findTrainingNameById(trainingId: String): Training? {
+        return trainingDao.getById(trainingId)
+    }
+
+    fun base64ToBitmap(base64String: String): Bitmap? {
+        val decodedString = Base64.decode(base64String, Base64.DEFAULT)
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+    }
+    suspend fun getListNamesOfTraining(): List<Training>? {
+        return withContext(Dispatchers.IO) {
+            val list: MutableList<Training> = mutableListOf()
+            Log.d("Doing", trainingSign.value.toString())
+            val listOfSigned = trainingSignDao.getTrainingSignsSync()
+            Log.d("Doing", "listOfSigned = "+listOfSigned.toString())
+            for (i in listOfSigned) {
+                val training = findTrainingNameById(i.trainingId)
+                if (training != null) {
+                    list.add(training)
+                }
+            }
+            list
+        }
+    }
+
+    suspend fun saveImage(image: Uri, contentResolver: ContentResolver):String? {
 
         val result = repository.putImage(image, contentResolver)
 
         if (result == "1") _savedImage.postValue(true)
         else _savedImage.postValue(false)
         result?.let {
-            Log.d("Doing", result)
+            Log.d("Doing", "В профиле в методе saveImage "+result)
         }
+        return result
 
+    }
+
+    suspend fun getImage():String? {
+        return repository.getImage()
     }
 
 
     private fun fetchAndStoreTrainings() {
         viewModelScope.launch {
             repository.fetchAndSaveTrainings()
+            repository.fetchAndSaveSignedTrainings()
             updateTrainings()
         }
     }
@@ -60,12 +98,11 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
     private fun updateTrainings() {
         viewModelScope.launch {
             val trainingList = trainingDao.getTrainingsSync()
+            val trainingSignList = trainingSignDao.getTrainingSignsSync()
             _trainings.postValue(trainingList)
+            _trainingSigns.postValue(trainingSignList)
         }
     }
 
-    fun getTrainingSign() {
-        repository.getSignedTrainings()
-    }
 
 }

@@ -13,7 +13,7 @@ interface TrainingSignDao {
     fun getTrainings(): Flow<List<TrainingSign>>
 
     @Query("SELECT * FROM training_sign WHERE personId = :trainingId LIMIT 1")
-    fun getById(trainingId: String): TrainingSign?
+    suspend fun getById(trainingId: String): TrainingSign?
 
     @Query("SELECT * FROM training_sign")
     suspend fun getTrainingSignsSync(): List<TrainingSign>
