@@ -3,10 +3,8 @@ package com.example.danceclub.ui.screens.trainings
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.danceclub.data.local.AppDatabase
 import com.example.danceclub.data.local.dao.PersonsDao
@@ -15,11 +13,8 @@ import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.data.remote.RepositoryProvider
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
@@ -63,11 +58,13 @@ class TrainingsScreenViewModel(application: Application) : AndroidViewModel(appl
 
     suspend fun isSignedIn(trainingId: String): Boolean {
         return withContext(Dispatchers.IO) {
-            trainingSignDao.getById(trainingId) != null
+            val result = trainingSignDao.getById(trainingId) != null
+            return@withContext result
         }
     }
 
     fun currentMonthTrainings(month: Int): List<Training>? {
+        // doesn't work correctly
         var trainingList: List<Training>? = null
         viewModelScope.launch {
             trainings.asFlow().collect {
@@ -79,14 +76,12 @@ class TrainingsScreenViewModel(application: Application) : AndroidViewModel(appl
         if (month == 0) {
             return trainingList
         }
-        Log.d("Doing", "trainingList in currentMonthTrainings: $trainingList")
         if (trainingList != null) {
-            for (training in trainingList!!) {
-                if (training.date.monthValue == month)
-                    trainingWithMonth.add(training)
+            for (i in trainingList) {
+                if (i.date.monthValue == month)
+                    trainingWithMonth.add(i)
             }
         }
-
         return trainingWithMonth
     }
 

@@ -36,7 +36,6 @@ import com.example.danceclub.R
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
-import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -108,9 +107,10 @@ fun TrainingsScreen(
                 val currentTraining = trainingScreenViewModel.currentTraining.value
 
                 LaunchedEffect(currentTraining) {
+                    val personId = trainingScreenViewModel.getCurrentPerson().id
                     if (currentTraining != null) {
-                        isSignedIn = trainingScreenViewModel.isSignedIn(trainingScreenViewModel.getCurrentPerson().id)
-                        Log.d("Doing", "в основном $currentTraining" + isSignedIn.toString())
+                        isSignedIn = trainingScreenViewModel.isSignedIn(currentTraining.id)
+                        Log.d("Doing", "в основном ${currentTraining.id} $personId, isSignedIn: $isSignedIn")
                     }
                 }
 
