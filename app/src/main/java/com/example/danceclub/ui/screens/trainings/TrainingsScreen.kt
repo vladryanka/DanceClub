@@ -18,6 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -40,6 +42,7 @@ fun TrainingsScreen(
     onNavigateUpToProfile: () -> Unit
 ) {
 
+    val currentTraining by trainingScreenViewModel.currentTraining.observeAsState()
 
     BackHandler { onNavigateUpToProfile() }
     val isItem1Visible = remember { mutableStateOf(false) }
@@ -99,20 +102,17 @@ fun TrainingsScreen(
 
         when (isItem1Visible.value) {
             true -> {
-
-                val currentTraining = trainingScreenViewModel.currentTraining.value
-                if (currentTraining != null)
-
+                currentTraining?.let { training ->
                     DetailItem(
                         contentPadding,
-                        currentTraining, ::changeVisibility,
+                        training,
+                        ::changeVisibility,
                         trainingScreenViewModel::singInTraining,
                         trainingScreenViewModel.getCurrentPerson().id,
                         trainingScreenViewModel::isSignedIn
-
                     )
+                }
             }
-
             false -> {
                 TrainingCardsItem(
                     contentPadding,

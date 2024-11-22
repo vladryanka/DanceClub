@@ -40,6 +40,9 @@ class TrainingScreenViewModel(application: Application) : AndroidViewModel(appli
         viewModelScope.launch {
             val trainingList = trainingDao.getTrainingsSync()
             _trainings.postValue(trainingList)
+            if (trainingList.isNotEmpty()) {
+                _currentTraining.postValue(trainingList[0])
+            }
         }
     }
     fun getCurrentPerson():Person = repository.currentPerson

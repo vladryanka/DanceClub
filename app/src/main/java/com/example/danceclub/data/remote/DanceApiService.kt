@@ -8,6 +8,7 @@ import com.example.danceclub.data.request.RegisterRequest
 import com.example.danceclub.data.response.RegistrationResponse
 import com.example.danceclub.data.model.Token
 import com.example.danceclub.data.model.Training
+import com.example.danceclub.data.request.ImageRequest
 import com.example.danceclub.data.response.ImageResponse
 import com.example.danceclub.data.response.LoginResponse
 import com.example.danceclub.data.response.PersonResponse
@@ -95,8 +96,11 @@ interface DanceApiService {
     @PUT("person/picture")
     suspend fun putImage(
         @Header("Authorization") bearerToken: String,
-        @Body image: String
+        @Body imageRequest: ImageRequest
     ):Response<Void>
+
+    @GET("admin/logs")
+    fun getAdminLogs():Response<String>
 
     @GET("person/picture")
     suspend fun getImage(

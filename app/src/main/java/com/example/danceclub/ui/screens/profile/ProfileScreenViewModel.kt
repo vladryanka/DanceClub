@@ -62,14 +62,13 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
     }
 
     suspend fun saveImage(image: Uri, contentResolver: ContentResolver):String? {
-        Log.d("Doing", "Пришли в saveImage")
 
         val result = repository.putImage(image, contentResolver)
 
         if (result == "1") _savedImage.postValue(true)
         else _savedImage.postValue(false)
         result?.let {
-            Log.d("Doing", result)
+            Log.d("Doing", "В профиле в методе saveImage "+result)
         }
         return result
 

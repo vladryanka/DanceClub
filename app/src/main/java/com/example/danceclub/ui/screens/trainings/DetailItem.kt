@@ -46,11 +46,8 @@ fun DetailItem(
     val snackbarHostState = remember { SnackbarHostState() }
     var isSignedIn by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            if (isSignedInFunction(training.id)) isSignedIn = true
-            else isSignedIn = false
-        }
+    LaunchedEffect(training.id) {
+        isSignedIn = isSignedInFunction(training.id)
     }
     Column(
         modifier = Modifier

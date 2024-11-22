@@ -18,6 +18,7 @@ suspend fun <T : Any> handleApi(
 
         if (response.isSuccessful) {
             val body = response.body()
+            Log.d("Doing", "в handleApi "+body.toString())
             if (body != null) {
                 NetworkResult.Success(response.code(), body)
             } else {
