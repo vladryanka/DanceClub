@@ -44,11 +44,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
+import com.example.danceclub.R
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.ui.theme.DanceClubTheme
@@ -162,9 +165,11 @@ fun ProfileScreen(
                         }
                     }
             ) {
-                if (imageBitmapFromServer != null)
+
                     Image(
-                        bitmap = imageBitmapFromServer!!,
+                        painter =
+                            imageBitmapFromServer?.let { rememberAsyncImagePainter(imageBitmapFromServer) }
+                                ?: painterResource(id = R.drawable.profile_image),
                         contentDescription = "Profile Image",
                         modifier = Modifier
                             .fillMaxSize()

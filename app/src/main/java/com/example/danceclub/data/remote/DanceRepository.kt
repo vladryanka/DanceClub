@@ -61,6 +61,7 @@ class DanceRepository(
         when (result) {
             is NetworkResult.Success -> {
                 trainingSignDao.add(TrainingSign(trainingId = training.id, personId = personId))
+                trainingDao.updateTrainingStatusAndFreeSpace(training.id)
             }
 
             is NetworkResult.Error -> {

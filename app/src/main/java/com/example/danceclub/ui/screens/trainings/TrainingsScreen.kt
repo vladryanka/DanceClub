@@ -1,5 +1,6 @@
 package com.example.danceclub.ui.screens.trainings
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -32,8 +33,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.danceclub.R
+import com.example.danceclub.data.model.Training
 import com.example.danceclub.ui.theme.DanceClubTheme
 import com.example.danceclub.ui.utils.PreviewLightDark
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +50,7 @@ fun TrainingsScreen(
         isItem1Visible = !isItem1Visible
     }
     var isSignedIn by remember { mutableStateOf(false) }
+    var trainingSignsWithMonth by remember { mutableStateOf<List<Training>>(emptyList()) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -106,6 +110,7 @@ fun TrainingsScreen(
                 LaunchedEffect(currentTraining) {
                     if (currentTraining != null) {
                         isSignedIn = trainingScreenViewModel.isSignedIn(trainingScreenViewModel.getCurrentPerson().id)
+                        Log.d("Doing", "в основном $currentTraining" + isSignedIn.toString())
                     }
                 }
 
