@@ -64,7 +64,14 @@ class TrainingsScreenViewModel(application: Application) : AndroidViewModel(appl
     }
 
     fun currentMonthTrainings(month: Int): List<Training>? {
-        val trainingList = trainings.value
+        // doesn't work correctly
+        var trainingList: List<Training>? = null
+        viewModelScope.launch {
+            trainings.asFlow().collect {
+                trainingList = it
+                Log.d("Doing", "trainingList in currentMonthTrainings in flow: $trainingList")
+            }
+        }
         val trainingWithMonth: MutableList<Training> = mutableListOf()
         if (month == 0) {
             return trainingList

@@ -2,6 +2,7 @@ package com.example.danceclub.ui.screens.profile
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -42,13 +43,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.danceclub.R
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.ui.theme.DanceClubTheme
@@ -66,9 +70,8 @@ fun ProfileScreen(
     onNavigateToTrainings: () -> Unit,
 ) {
 
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var signedTrainingList by remember { mutableStateOf<List<Training>>(emptyList()) }
-    var imageBitmapFromServer by remember { mutableStateOf<ImageBitmap?>(null) }
+    var selectedImageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
     val context = LocalContext.current
     val contentResolver = context.contentResolver
@@ -77,8 +80,8 @@ fun ProfileScreen(
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            imageBitmapFromServer = viewModel.getImage()
-            Log.d("Doing", "ImageBitmapFromServer: $imageBitmapFromServer")
+            selectedImageBitmap = viewModel.getImage()
+            Log.d("Doing", "ImageBitmapFromServer: $selectedImageBitmap")
         }
     }
 
@@ -86,7 +89,8 @@ fun ProfileScreen(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri: Uri? ->
             uri?.let {
-                selectedImageUri = it
+                val source = ImageDecoder.createSource(contentResolver, it)
+                selectedImageBitmap = ImageDecoder.decodeBitmap(source).asImageBitmap()
                 coroutineScope.launch {
                     withContext(Dispatchers.IO) {
                         val result = viewModel.saveImage(it, contentResolver)
@@ -162,16 +166,16 @@ fun ProfileScreen(
                         }
                     }
             ) {
-                if (imageBitmapFromServer != null)
-                    Image(
-                        bitmap = imageBitmapFromServer!!,
-                        contentDescription = "Profile Image",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
-                            .border(2.dp, Color.Gray, CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
+                Image(
+                    bitmap = selectedImageBitmap
+                        ?: ImageBitmap.imageResource(id = R.drawable.profile_image),
+                    contentDescription = "Profile Image",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .border(2.dp, Color.Gray, CircleShape),
+                    contentScale = ContentScale.Crop
+                )
             }
 
             Spacer(modifier = Modifier.width(16.dp))
