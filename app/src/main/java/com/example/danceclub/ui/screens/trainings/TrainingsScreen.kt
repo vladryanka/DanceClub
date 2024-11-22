@@ -18,8 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -40,11 +42,9 @@ fun TrainingsScreen(
     onNavigateUpToProfile: () -> Unit
 ) {
 
-
-    BackHandler { onNavigateUpToProfile() }
-    val isItem1Visible = remember { mutableStateOf(false) }
+    var isItem1Visible by remember { mutableStateOf(false) }
     fun changeVisibility() {
-        isItem1Visible.value = !isItem1Visible.value
+        isItem1Visible = !isItem1Visible
     }
     Scaffold(
         topBar = {
@@ -63,7 +63,8 @@ fun TrainingsScreen(
                             modifier = Modifier
                                 .size(32.dp)
                                 .clickable {
-                                    onNavigateUpToProfile()
+                                    if (isItem1Visible) changeVisibility()
+                                    else onNavigateUpToProfile()
                                 }
                         )
                         Image(
@@ -97,7 +98,7 @@ fun TrainingsScreen(
     ) { contentPadding ->
 
 
-        when (isItem1Visible.value) {
+        when (isItem1Visible) {
             true -> {
 
                 val currentTraining = trainingScreenViewModel.currentTraining.value

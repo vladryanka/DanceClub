@@ -282,10 +282,15 @@ class DanceRepository(
     suspend fun fetchAndSaveTrainings() {
         val trainingResponse = apiService.loadTrainingsResponse().trainings
         val trainingList = trainingDao.getTrainingsSync()
+        Log.d("Doing", trainingList.toString())
+        val existingTrainingIds = trainingList.map { it.id }.toSet()
         withContext(Dispatchers.IO) {
             for (training in trainingResponse!!) {
-                if (!trainingList.contains(training)) {
+                if (!existingTrainingIds.contains(training.id)) {
+                    Log.d("Doing", "Adding training: ${training.toString()}")
                     trainingDao.add(training)
+                } else {
+                    Log.d("Doing", "Training already exists: ${training.toString()}")
                 }
             }
         }

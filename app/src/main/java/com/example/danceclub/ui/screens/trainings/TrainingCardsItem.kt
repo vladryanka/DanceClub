@@ -15,14 +15,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -47,8 +48,7 @@ import com.example.danceclub.data.model.Training
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-// Добавить фильтр по месяцу
-// краш на профиль назад
+// TODO: Добавить фильтр по месяцу
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,10 +56,10 @@ fun TrainingCardsItem(
     contentPadding: PaddingValues,
     updateCurrentTrainings: (Training) -> Unit,
     changeVisibility: () -> Unit,
-    currentMonthTrainings: (Int) -> List<Training>?
+    currentMonthTrainings: (Int) -> List<Training>?,
 ) {
     val months = listOf(
-        "Все","Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+        "Все", "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
         "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
     )
     var expanded by remember { mutableStateOf(false) }
@@ -72,24 +72,21 @@ fun TrainingCardsItem(
 
     var trainingList = currentMonthTrainings(LocalDate.now().monthValue)
 
-
     Column(
         modifier = Modifier
             .padding(top = contentPadding.calculateTopPadding()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-    )
-    {
+    ) {
 
-        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
             TextField(
-                readOnly = true,
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
                 value = selectedMonth,
                 onValueChange = {},
-                modifier = Modifier.clickable(onClick = { expanded = true }),
-                trailingIcon = {
-                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null)
-                }
+                readOnly = true,
+                singleLine = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             )
 
             ExposedDropdownMenu(
@@ -99,12 +96,12 @@ fun TrainingCardsItem(
             ) {
                 months.forEach { month ->
                     DropdownMenuItem(
+                        text = { Text(text = month) },
                         onClick = {
                             selectedMonth = month
+                            trainingList = currentMonthTrainings(months.indexOf(month))
                             expanded = false
-                            trainingList =
-                                currentMonthTrainings(months.indexOf(month))
-                        }, text = { Text(month)}
+                        },
                     )
                 }
             }
@@ -122,9 +119,9 @@ fun TrainingCardsItem(
                         .clip(RoundedCornerShape(16.dp))
                         .clickable(onClick = {
                             updateCurrentTrainings(item)
-                            Log.d("Doing",item.toString())
-                            if (item.freeSpace>0)
-                            changeVisibility()
+                            Log.d("Doing", item.toString())
+                            if (item.freeSpace > 0)
+                                changeVisibility()
                             else {
                                 scope.launch {
                                     snackbarHostState.showSnackbar(
@@ -179,5 +176,6 @@ fun TrainingCardsItem(
                 }
             }
         }
+
     }
 }

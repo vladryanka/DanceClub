@@ -42,18 +42,9 @@ fun DanceAppNavHost(
                 onNavigateToProfile = { person: Person ->
                     val personJson = Json.encodeToString(person)
                     navController.navigate(route = "$ProfileDestination/$personJson")
-                    {
-                        popUpTo<ProfileDestination> {
-                            inclusive = true
-                        }
-                    }
                 },
                 onNavigateUpToGreeting = {
-                    navController.navigate(route = GreetingDestination) {
-                        popUpTo<GreetingDestination> {
-                            inclusive = true
-                        }
-                    }
+                    navController.navigateUp()
                 }
             )
         }
@@ -69,18 +60,14 @@ fun DanceAppNavHost(
                     }
                 },
                 onNavigateUpToGreeting = {
-                    navController.navigate(route = GreetingDestination) {
-                        popUpTo<GreetingDestination> {
-                            inclusive = true
-                        }
-                    }
+                    navController.navigateUp()
                 }
             )
         }
         composable("$ProfileDestination/{personJson}") { backStackEntry ->
             val personJson = backStackEntry.arguments?.getString("personJson")
-            val person =
-                Json.decodeFromString<Person>(personJson ?: "{}")
+            val person = Json.decodeFromString<Person>(personJson ?: "{}")
+
             ProfileScreen(
                 person = person,
                 onNavigateToTrainings = {
@@ -91,11 +78,7 @@ fun DanceAppNavHost(
         composable<TrainingsDestination> {
             TrainingsScreen(
                 onNavigateUpToProfile = {
-                    navController.navigate(route = ProfileDestination) {
-                        popUpTo<ProfileDestination> {
-                            inclusive = true
-                        }
-                    }
+                    navController.navigateUp()
                 }
 
             )

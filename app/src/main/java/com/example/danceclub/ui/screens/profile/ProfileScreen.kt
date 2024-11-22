@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -78,6 +79,10 @@ fun ProfileScreen(
 
     val signedTrainingList = viewModel.getTrainingSign()
 
+    BackHandler {
+        // no back navigation
+        // may save settings and then close app
+    }
 
     Column(
         modifier = Modifier
