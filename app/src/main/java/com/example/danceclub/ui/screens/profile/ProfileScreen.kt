@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -105,6 +106,10 @@ fun ProfileScreen(
         }
     }
 
+    BackHandler {
+        // no back navigation
+        // may save settings and then close app
+    }
 
     Column(
         modifier = Modifier

@@ -1,6 +1,5 @@
 package com.example.danceclub.ui.screens.trainings
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -19,9 +18,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -42,12 +41,9 @@ fun TrainingsScreen(
     onNavigateUpToProfile: () -> Unit
 ) {
 
-    val currentTraining by trainingScreenViewModel.currentTraining.observeAsState()
-
-    BackHandler { onNavigateUpToProfile() }
-    val isItem1Visible = remember { mutableStateOf(false) }
+    var isItem1Visible by remember { mutableStateOf(false) }
     fun changeVisibility() {
-        isItem1Visible.value = !isItem1Visible.value
+        isItem1Visible = !isItem1Visible
     }
     Scaffold(
         topBar = {
@@ -66,7 +62,8 @@ fun TrainingsScreen(
                             modifier = Modifier
                                 .size(32.dp)
                                 .clickable {
-                                    onNavigateUpToProfile()
+                                    if (isItem1Visible) changeVisibility()
+                                    else onNavigateUpToProfile()
                                 }
                         )
                         Image(
@@ -100,19 +97,20 @@ fun TrainingsScreen(
     ) { contentPadding ->
 
 
-        when (isItem1Visible.value) {
+        when (isItem1Visible) {
             true -> {
-                currentTraining?.let { training ->
+
+                val currentTraining = trainingScreenViewModel.currentTraining.value
+                if (currentTraining != null)
                     DetailItem(
                         contentPadding,
-                        training,
-                        ::changeVisibility,
+                        currentTraining, ::changeVisibility,
                         trainingScreenViewModel::singInTraining,
-                        trainingScreenViewModel.getCurrentPerson().id,
-                        trainingScreenViewModel::isSignedIn
+                        trainingScreenViewModel.getCurrentPerson().id
+
                     )
-                }
             }
+
             false -> {
                 TrainingCardsItem(
                     contentPadding,
