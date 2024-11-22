@@ -50,15 +50,13 @@ private val retrofit: Retrofit = Retrofit.Builder()
     .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
     .build()
 
-val apiService: DanceApiService = retrofit.create(DanceApiService::class.java)
-
 interface DanceApiService {
     @GET("training/all")
     suspend fun loadTrainingsResponse(): TrainingResponse
 
     @GET("training/signed")
     suspend fun loadSignedTrainingResponse(
-        @Header("Authorization") bearerToken: String
+        @Header("Authorization") bearerToken: String,
     ): TrainingResponse
 
     @GET("person/all")
@@ -66,7 +64,7 @@ interface DanceApiService {
 
     @POST("auth/login")
     suspend fun login(
-        @Body loginRequest: LoginRequest
+        @Body loginRequest: LoginRequest,
     ): Response<LoginResponse>
 
     @POST("auth/newTokens")
@@ -79,33 +77,33 @@ interface DanceApiService {
     @POST("auth/changePassword")
     suspend fun changePassword(
         @Header("Authorization") bearerToken: String,
-        @Body training: Training
+        @Body training: Training,
     )
 
     @POST("auth/register")
     suspend fun register(
-        @Body registerRequest: RegisterRequest
+        @Body registerRequest: RegisterRequest,
     ): Response<RegistrationResponse>
 
     @POST("sign/add")
     suspend fun addSign(
         @Header("Authorization") bearerToken: String,
-        @Query("trainingId")trainingId: String
-    ):Response<Void>
+        @Query("trainingId") trainingId: String,
+    ): Response<Void>
+
+    @GET("admin/logs")
+    fun getAdminLogs(): Response<String>
 
     @PUT("person/picture")
     suspend fun putImage(
         @Header("Authorization") bearerToken: String,
-        @Body imageRequest: ImageRequest
-    ):Response<Void>
-
-    @GET("admin/logs")
-    fun getAdminLogs():Response<String>
+        @Body imageRequest: ImageRequest,
+    ): Response<Void>
 
     @GET("person/picture")
     suspend fun getImage(
-        @Header("Authorization") bearerToken: String
-    ):Response<ImageResponse>
+        @Header("Authorization") bearerToken: String,
+    ): Response<ImageResponse>
 }
 
 object DanceApi {
@@ -118,7 +116,11 @@ object RepositoryProvider {
 
     private lateinit var repository: DanceRepository
 
-    fun initialize(personsDao: PersonsDao, trainingDao: TrainingDao, trainingSignDao: TrainingSignDao) {
+    fun initialize(
+        personsDao: PersonsDao,
+        trainingDao: TrainingDao,
+        trainingSignDao: TrainingSignDao,
+    ) {
         repository = DanceRepository(personsDao, trainingDao, trainingSignDao)
     }
 

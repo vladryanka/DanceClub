@@ -48,14 +48,13 @@ import com.example.danceclub.data.model.Training
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TrainingCardsItem(
+fun TrainingsCards(
     contentPadding: PaddingValues,
     updateCurrentTrainings: (Training) -> Unit,
     changeVisibility: () -> Unit,
-    currentMonthTrainings: (Int) -> List<Training>?
+    currentMonthTrainings: (Int) -> List<Training>?,
 ) {
     val months = listOf(
         "Все", "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
@@ -63,14 +62,14 @@ fun TrainingCardsItem(
     )
     var expanded by remember { mutableStateOf(false) }
 
-    var selectedMonth by remember { mutableStateOf(months[LocalDate.now().monthValue]) }
+    val currentMonthNum = LocalDate.now().monthValue
+    var selectedMonth by remember { mutableStateOf(months[currentMonthNum]) }
     val isChecked: Boolean by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    //var trainingList = currentMonthTrainings(LocalDate.now().monthValue)
-    var trainingList by remember { mutableStateOf(currentMonthTrainings(LocalDate.now().monthValue)) }
+    var trainingList by remember { mutableStateOf(currentMonthTrainings(currentMonthNum)) }
 
     Column(
         modifier = Modifier
@@ -94,12 +93,12 @@ fun TrainingCardsItem(
                 onDismissRequest = { expanded = false },
                 modifier = Modifier.clip(RoundedCornerShape(60.dp))
             ) {
-                months.forEach { month ->
+                months.forEachIndexed { index, month ->
                     DropdownMenuItem(
                         text = { Text(text = month) },
                         onClick = {
                             selectedMonth = month
-                            trainingList = currentMonthTrainings(months.indexOf(month))
+                            trainingList = currentMonthTrainings(index)
                             Log.d("Doing", trainingList.toString())
                             expanded = false
                         },
@@ -107,13 +106,14 @@ fun TrainingCardsItem(
                 }
             }
         }
+
         if (trainingList?.isEmpty() == true) {
             Text(
-                text = "Нет тренировок на выбранный месяц", modifier = Modifier.padding(8.dp),
+                text = "Нет тренировок на выбранный месяц",
+                modifier = Modifier.padding(8.dp),
                 style = TextStyle(fontSize = 16.sp)
             )
         } else {
-
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 contentPadding = PaddingValues(16.dp)

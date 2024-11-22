@@ -2,9 +2,8 @@ package com.example.danceclub.ui.screens.profile
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -15,6 +14,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,17 +41,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberAsyncImagePainter
-import com.example.danceclub.R
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.ui.theme.DanceClubTheme
@@ -59,7 +56,7 @@ import com.example.danceclub.ui.utils.PreviewLightDark
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
+import java.time.LocalDate
 
 @SuppressLint("RememberReturnType")
 @Composable
@@ -71,54 +68,65 @@ fun ProfileScreen(
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var signedTrainingList by remember { mutableStateOf<List<Training>>(emptyList()) }
-    val coroutineScope = rememberCoroutineScope()
-    var imageFromServer by remember { mutableStateOf<String?>(null) }
-    val snackbarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            imageFromServer = viewModel.getImage()
-            Log.d("Doing", imageFromServer.toString())
-        }
-    }
-    val bitmap = remember(imageFromServer) {
-        if (imageFromServer != null) {
-            viewModel.base64ToBitmap(imageFromServer ?: "")
-        }
-    }
+    var imageBitmapFromServer by remember { mutableStateOf<ImageBitmap?>(null) }
 
     val context = LocalContext.current
-    val getContent = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? ->
-        uri?.let {
-            selectedImageUri = it
-            coroutineScope.launch {
-                withContext(Dispatchers.IO) {
-                    val result = viewModel.saveImage(it, context.contentResolver)
-                    if (result != null)
-                        snackbarHostState.showSnackbar(
-                            result,
-                            withDismissAction = true,
-                            duration = SnackbarDuration.Short
-                        )
+    val contentResolver = context.contentResolver
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            imageBitmapFromServer = viewModel.getImage()
+            Log.d("Doing", "ImageBitmapFromServer: $imageBitmapFromServer")
+        }
+    }
+
+    val pickImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri: Uri? ->
+            uri?.let {
+                selectedImageUri = it
+                coroutineScope.launch {
+                    withContext(Dispatchers.IO) {
+                        val result = viewModel.saveImage(it, contentResolver)
+                        if (result != null)
+                            snackbarHostState.showSnackbar(
+                                result,
+                                withDismissAction = true,
+                                duration = SnackbarDuration.Short
+                            )
+
+                    }
                 }
             }
         }
-    }
-    val painter = when {
-        //true -> BitmapPainter(bitmap.asImageBitmap()) TODO
-        selectedImageUri != null -> rememberAsyncImagePainter(selectedImageUri)
-        else -> painterResource(id = R.drawable.profile_image)
-    }
+    )
 
-
+    // permission launcher for Android 9 and 10
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                pickImageLauncher.launch(
+                    PickVisualMediaRequest(
+                        mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                )
+                Toast
+                    .makeText(context, "Gallery run", Toast.LENGTH_LONG)
+                    .show()
+            } else {
+                // Permission not granted
+                // Handling is optional
+                // Recommended to show user a warning and let try again
+            }
+        }
+    )
 
     LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val trainingList = viewModel.getListNamesOfTraining()
-            signedTrainingList = trainingList ?: emptyList()
-        }
+        val trainingList = viewModel.getListNamesOfTraining()
+        signedTrainingList = trainingList
     }
 
     BackHandler {
@@ -138,37 +146,33 @@ fun ProfileScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Image(
-                painter = rememberAsyncImagePainter(
-                    painter
-                ),
-                contentDescription = "Profile Image",
+            Box(
                 modifier = Modifier
                     .size(160.dp)
                     .clip(CircleShape)
-                    .border(2.dp, Color.Gray, CircleShape)
                     .clickable {
-                        when {
-                            ContextCompat.checkSelfPermission(
-                                context as Activity,
-                                Manifest.permission.MANAGE_EXTERNAL_STORAGE
-                            ) == PackageManager.PERMISSION_GRANTED -> {
-                                Toast
-                                    .makeText(context, "Gallery run", Toast.LENGTH_LONG)
-                                    .show()
-                            }
-
-                            else -> {
-                                getContent.launch(
-                                    PickVisualMediaRequest(
-                                        mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
-                                    )
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            pickImageLauncher.launch(
+                                PickVisualMediaRequest(
+                                    mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
                                 )
-                            }
+                            )
+                        } else {
+                            permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                         }
-                    },
-                contentScale = ContentScale.Crop
-            )
+                    }
+            ) {
+                if (imageBitmapFromServer != null)
+                    Image(
+                        bitmap = imageBitmapFromServer!!,
+                        contentDescription = "Profile Image",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                            .border(2.dp, Color.Gray, CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+            }
 
             Spacer(modifier = Modifier.width(16.dp))
 
@@ -218,8 +222,7 @@ fun ProfileScreen(
             color = Color.Black
         )
 
-        LazyColumn(
-        ) {
+        LazyColumn {
             if (signedTrainingList.isEmpty()) {
                 item {
                     Text(
@@ -249,7 +252,6 @@ fun ProfileScreen(
         }
     }
 
-
 }
 
 @PreviewLightDark
@@ -257,10 +259,16 @@ fun ProfileScreen(
 fun ProfileScreenPreview() {
     DanceClubTheme {
         Surface {
-            /*ProfileScreen(
+            ProfileScreen(
+                person = Person(
+                    name = "Steve",
+                    surname = "Jobs",
+                    patronimic = "Second",
+                    phone = "911",
+                    birth_date = LocalDate.now(),
+                ),
                 onNavigateToTrainings = {},
-                person = TODO()
-            )*/
+            )
         }
     }
 }

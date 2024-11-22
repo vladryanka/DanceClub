@@ -38,7 +38,7 @@ import com.example.danceclub.ui.utils.PreviewLightDark
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrainingsScreen(
-    trainingScreenViewModel: TrainingScreenViewModel = viewModel(),
+    trainingScreenViewModel: TrainingsScreenViewModel = viewModel(),
     onNavigateUpToProfile: () -> Unit
 ) {
 
@@ -122,7 +122,7 @@ fun TrainingsScreen(
             }
 
             false -> {
-                TrainingCardsItem(
+                TrainingsCards(
                     contentPadding,
                     trainingScreenViewModel::updateCurrentTrainings,
                     ::changeVisibility,

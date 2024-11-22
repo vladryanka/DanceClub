@@ -1,10 +1,9 @@
 package com.example.danceclub.data.remote
 
 import android.content.ContentResolver
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
 import com.example.danceclub.data.local.dao.PersonsDao
 import com.example.danceclub.data.local.dao.TrainingDao
 import com.example.danceclub.data.local.dao.TrainingSignDao
@@ -15,6 +14,8 @@ import com.example.danceclub.data.model.TrainingSign
 import com.example.danceclub.data.request.ImageRequest
 import com.example.danceclub.data.request.LoginRequest
 import com.example.danceclub.data.request.RegisterRequest
+import com.example.danceclub.utils.base64StringToImageBitmap
+import com.example.danceclub.utils.uriToBase64String
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.CoroutineScope
@@ -22,8 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.util.Base64
@@ -32,14 +31,14 @@ import java.util.Date
 class DanceRepository(
     private val personDao: PersonsDao,
     private val trainingDao: TrainingDao,
-    private val trainingSignDao: TrainingSignDao
+    private val trainingSignDao: TrainingSignDao,
 ) {
 
     lateinit var token: Token
     lateinit var currentPerson: Person
 
     suspend fun fetchAndSavePersons(token: String) {
-        val personResponse = apiService.loadPersonsResponse("Bearer $token")
+        val personResponse = DanceApi.retrofitService.loadPersonsResponse("Bearer $token")
         val persons = personResponse.getPersons() ?: return
 
         val personList = personDao.getPersons().firstOrNull()
@@ -56,7 +55,7 @@ class DanceRepository(
     }
 
     suspend fun postSign(training: Training, personId: String): String? {
-        val response = apiService.addSign("Bearer ${token.accessToken}", training.id)
+        val response = DanceApi.retrofitService.addSign("Bearer ${token.accessToken}", training.id)
         val result = handleApi { response }
         var errorType: String? = null
         when (result) {
@@ -65,7 +64,7 @@ class DanceRepository(
             }
 
             is NetworkResult.Error -> {
-                if(result.code != 409){
+                if (result.code != 409) {
                     errorType = result.errorMsg
                     Log.d("Doing", "login failed: $errorType")
                 }
@@ -112,8 +111,9 @@ class DanceRepository(
                 val expRefresh = decodeJWT(token.refreshToken)
                 if (expRefresh != null) { // Токен RefreshToken истек
                     if (isTokenExpired(expRefresh)) {
-                        CoroutineScope(Dispatchers.IO).launch() {
-                            val newToken = apiService.newTokens("Bearer ${token.refreshToken}")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val newToken =
+                                DanceApi.retrofitService.newTokens("Bearer ${token.refreshToken}")
                             token = newToken.body()?.let {
                                 Token(
                                     accessToken = it.accessToken,
@@ -124,9 +124,9 @@ class DanceRepository(
                     }
 
                 } else {
-                    CoroutineScope(Dispatchers.IO).launch() {
+                    CoroutineScope(Dispatchers.IO).launch {
                         val newAccessToken =
-                            apiService.newAccessToken("Bearer ${token.refreshToken}")
+                            DanceApi.retrofitService.newAccessToken("Bearer ${token.refreshToken}")
                         token = newAccessToken.body()?.let {
                             Token(
                                 accessToken = it.accessToken,
@@ -142,7 +142,7 @@ class DanceRepository(
     }
 
     suspend fun login(phone: String, password: String): String? {
-        val result = handleApi { apiService.login(LoginRequest(phone, password)) }
+        val result = handleApi { DanceApi.retrofitService.login(LoginRequest(phone, password)) }
         var errorType: String? = null
 
         when (result) {
@@ -173,20 +173,20 @@ class DanceRepository(
         var errorType: String? = null
         if (imageString != null) {
             getCurrentAccessToken()
-            val response = apiService
+            val response = DanceApi.retrofitService
                 .putImage(
                     "Bearer ${token.accessToken}",
                     ImageRequest(imageString)
                 )
             val result = handleApi { response }
-            Log.d("Doing",result.toString())
+            Log.d("Doing", result.toString())
             when (result) {
                 is NetworkResult.Success -> {
                     errorType = "1"
                 }
 
                 is NetworkResult.Error -> {
-                   // Log.d("Doing",apiService.getAdminLogs().body().toString())
+                    // Log.d("Doing",apiService.getAdminLogs().body().toString())
                     errorType = result.errorMsg
                     Log.d("Error", "$errorType")
                 }
@@ -201,65 +201,42 @@ class DanceRepository(
         return errorType
     }
 
-    suspend fun getImage(): String? {
-
-        var errorType: String? = null
+    suspend fun getImage(): ImageBitmap? {
         getCurrentAccessToken()
-        val response = apiService.getImage("Bearer ${token.accessToken}")
+        val response = DanceApi.retrofitService.getImage("Bearer ${token.accessToken}")
         val result = handleApi { response }
-        when (result) {
+
+        return when (result) {
             is NetworkResult.Success -> {
-                errorType = result.data.image
+                result.data.image?.let { base64StringToImageBitmap(it) }
             }
 
             is NetworkResult.Error -> {
-                errorType = result.errorMsg
-                Log.d("Error", "В профиле в Репозитории getImage $errorType")
+                Log.d("Error", "В профиле в Репозитории getImage ${result.errorMsg}")
+                null
             }
 
             is NetworkResult.Exception -> {
                 Log.d("Exception", "В профиле в Репозитории getImage" + result.e.toString())
-                errorType = "Неизвестная ошибка"
+                null
             }
-        }
-
-        return errorType
-    }
-
-    private fun uriToBase64String(contentResolver: ContentResolver, uri: Uri): String? {
-        return try {
-            // Получаем InputStream из Uri
-            val inputStream: InputStream? = contentResolver.openInputStream(uri)
-            // Декодируем InputStream в Bitmap
-            val bitmap: Bitmap = BitmapFactory.decodeStream(inputStream)
-
-            // Конвертируем Bitmap в байтовый массив
-            val byteArrayOutputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-            val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
-
-            // Кодируем байтовый массив в строку Base64
-            android.util.Base64.encodeToString(byteArray, android.util.Base64.DEFAULT)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
         }
     }
 
     suspend fun register(
         name: String,
         surname: String,
-        patronimic: String,
+        patronymic: String,
         phone: String,
-        password: String, birthday: LocalDate
+        password: String, birthday: LocalDate,
     ): Pair<String?, Person?> {
-        Log.d("Doing", "$name $surname $patronimic $phone $password $birthday")
+        Log.d("Doing", "$name $surname $patronymic $phone $password $birthday")
 
-        val registerResponse = apiService.register(
+        val registerResponse = DanceApi.retrofitService.register(
             RegisterRequest(
                 name,
                 surname,
-                patronimic,
+                patronymic,
                 phone,
                 password,
                 birthday.atStartOfDay(ZoneOffset.UTC).toEpochSecond()
@@ -295,7 +272,7 @@ class DanceRepository(
 
 
     suspend fun fetchAndSaveSignedTrainings() {
-        val trainingSignedResponse = apiService.loadSignedTrainingResponse(
+        val trainingSignedResponse = DanceApi.retrofitService.loadSignedTrainingResponse(
             "Bearer ${token.accessToken}"
         ).trainings ?: return
         val trainingList = trainingSignDao.getTrainingSignsSync()
@@ -311,7 +288,7 @@ class DanceRepository(
     }
 
     suspend fun fetchAndSaveTrainings() {
-        val trainingResponse = apiService.loadTrainingsResponse().trainings
+        val trainingResponse = DanceApi.retrofitService.loadTrainingsResponse().trainings
         val trainingList = trainingDao.getTrainingsSync()
         val existingTrainingIds = trainingList.map { it.id }.toSet()
         withContext(Dispatchers.IO) {
