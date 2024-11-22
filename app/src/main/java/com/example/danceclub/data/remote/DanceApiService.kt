@@ -63,9 +63,6 @@ interface DanceApiService {
     @GET("person/all")
     suspend fun loadPersonsResponse(@Header("Authorization") bearerToken: String): PersonResponse
 
-    @POST("training/add")
-    suspend fun pushNewTraining(@Body training: Training)
-
     @POST("auth/login")
     suspend fun login(
         @Body loginRequest: LoginRequest

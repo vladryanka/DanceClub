@@ -284,12 +284,6 @@ class DanceRepository(
     }
 
 
-    suspend fun pushAndSaveTraining(training: Training) {
-        return withContext(Dispatchers.IO) {
-            apiService.pushNewTraining(training)
-        }
-    }
-
     suspend fun fetchAndSaveSignedTrainings() {
         val trainingSignedResponse = apiService.loadSignedTrainingResponse(
             "Bearer ${token.accessToken}"
