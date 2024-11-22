@@ -139,6 +139,16 @@ fun DetailItem(
                 if (!isSignedIn) {
                     result = singInTraining(personId)
                     isSignedIn = true
+                } else {
+                    withContext(Dispatchers.Main) {
+                        if (result != null) {
+                            snackbarHostState.showSnackbar(
+                                "Вы уже записаны на тренировку",
+                                withDismissAction = true,
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    }
                 }
                 withContext(Dispatchers.Main) {
                     if (result != null) {
@@ -155,9 +165,8 @@ fun DetailItem(
             }
 
         }) {
-            Log.d("Doing", " внутри кнопки "+isSignedIn.toString())
+            Log.d("Doing", " внутри кнопки " + isSignedIn.toString())
             Text(
-
                 if (isSignedIn) "Вы записаны" else "Записаться",
                 color = Color.Black, textAlign = TextAlign.Center,
                 style = TextStyle(fontSize = 24.sp)

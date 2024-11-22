@@ -12,8 +12,8 @@ interface TrainingSignDao {
     @Query("SELECT * FROM training_sign")
     fun getTrainings(): Flow<List<TrainingSign>>
 
-    @Query("SELECT * FROM training_sign WHERE personId = :trainingId LIMIT 1")
-    suspend fun getById(trainingId: String): TrainingSign?
+    @Query("SELECT * FROM training_sign WHERE trainingId = :newTrainingId")
+    suspend fun getById(newTrainingId: String): TrainingSign?
 
     @Query("SELECT * FROM training_sign")
     suspend fun getTrainingSignsSync(): List<TrainingSign>
