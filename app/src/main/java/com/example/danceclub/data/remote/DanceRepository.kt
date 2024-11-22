@@ -55,7 +55,6 @@ class DanceRepository(
     }
 
     suspend fun postSign(training: Training, personId: String): String? {
-        Log.d("Doing", token.toString())
         val response = apiService.addSign("Bearer ${token.accessToken}", training.id)
         val result = handleApi { response }
         var errorType: String? = null

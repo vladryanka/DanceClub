@@ -13,7 +13,9 @@ import com.example.danceclub.data.local.dao.TrainingSignDao
 import com.example.danceclub.data.model.Person
 import com.example.danceclub.data.model.Training
 import com.example.danceclub.data.remote.RepositoryProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TrainingScreenViewModel(application: Application) : AndroidViewModel(application) {
     private val personDao: PersonsDao = AppDatabase.getInstance(application).personsDao()
@@ -43,8 +45,14 @@ class TrainingScreenViewModel(application: Application) : AndroidViewModel(appli
     fun getCurrentPerson():Person = repository.currentPerson
 
     suspend fun singInTraining(person: String):String? {
-        return currentTraining.value?.let { repository.postSign(it,person) }
+        return repository.postSign(currentTraining.value!!, person)
+    }
 
+    suspend fun isSignedIn(trainingId:String): Boolean{
+        return withContext(Dispatchers.IO) {
+            if (trainingSignDao.getById(trainingId) != null) true
+            else false
+        }
     }
 
     fun currentMonthTrainings(month: Int): List<Training>? {
