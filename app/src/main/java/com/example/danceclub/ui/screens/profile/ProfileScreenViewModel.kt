@@ -2,8 +2,12 @@ package com.example.danceclub.ui.screens.profile
 
 import android.app.Application
 import android.content.ContentResolver
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Base64
 import android.util.Log
+import androidx.compose.runtime.remember
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -46,11 +50,16 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
         return trainingDao.getById(trainingId)
     }
 
+    fun base64ToBitmap(base64String: String): Bitmap? {
+        val decodedString = Base64.decode(base64String, Base64.DEFAULT)
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+    }
     suspend fun getListNamesOfTraining(): List<Training>? {
         return withContext(Dispatchers.IO) {
             val list: MutableList<Training> = mutableListOf()
-            val listOfSigned = trainingSign.value ?: return@withContext null
-
+            Log.d("Doing", trainingSign.value.toString())
+            val listOfSigned = trainingSignDao.getTrainingSignsSync()
+            Log.d("Doing", "listOfSigned = "+listOfSigned.toString())
             for (i in listOfSigned) {
                 val training = findTrainingNameById(i.trainingId)
                 if (training != null) {
@@ -74,7 +83,16 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
 
     }
 
-    suspend fun getImage():String?= repository.getImage()
+    suspend fun getImage():String? {
+        val imageString = repository.getImage()
+
+
+        if (bitmap != null) {
+            return bitmap
+        } else {
+            return null
+        }
+    }
 
 
     private fun fetchAndStoreTrainings() {

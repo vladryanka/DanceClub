@@ -1,6 +1,7 @@
 package com.example.danceclub.ui.screens.profile
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -42,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -59,6 +61,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
+@SuppressLint("RememberReturnType")
 @Composable
 fun ProfileScreen(
     viewModel: ProfileScreenViewModel = viewModel(),
@@ -71,6 +74,17 @@ fun ProfileScreen(
     val coroutineScope = rememberCoroutineScope()
     var imageFromServer by remember { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            imageFromServer = viewModel.getImage()
+            Log.d("Doing", imageFromServer.toString())
+        }
+    }
+    val bitmap = remember(imageFromServer) {
+        if (imageFromServer != null) {
+            viewModel.base64ToBitmap(imageFromServer ?: "")
+        }
+    }
 
     val context = LocalContext.current
     val getContent = rememberLauncherForActivityResult(
@@ -92,12 +106,13 @@ fun ProfileScreen(
             }
         }
     }
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            imageFromServer = viewModel.getImage()
-            Log.d("Doing", imageFromServer.toString())
-        }
+    val painter = when {
+        //true -> BitmapPainter(bitmap.asImageBitmap()) TODO
+        selectedImageUri != null -> rememberAsyncImagePainter(selectedImageUri)
+        else -> painterResource(id = R.drawable.profile_image)
     }
+
+
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -125,7 +140,7 @@ fun ProfileScreen(
 
             Image(
                 painter = rememberAsyncImagePainter(
-                    imageFromServer ?: selectedImageUri ?: R.drawable.profile_image
+                    painter
                 ),
                 contentDescription = "Profile Image",
                 modifier = Modifier
@@ -196,14 +211,14 @@ fun ProfileScreen(
         Text(
             text = "Мои тренировки:",
             style = TextStyle(
-                fontSize = 16.sp
+                fontSize = 24.sp,
+                textDecoration = TextDecoration.Underline
             ),
             modifier = Modifier.padding(8.dp),
             color = Color.Black
         )
 
         LazyColumn(
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (signedTrainingList.isEmpty()) {
                 item {
@@ -211,12 +226,12 @@ fun ProfileScreen(
                         text = "Записей нет",
                         style = TextStyle(fontSize = 16.sp),
                         color = Color.Gray,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(8.dp)
                     )
                 }
             } else {
                 itemsIndexed(signedTrainingList) { _, item ->
-                    Row {
+                    Row(modifier = Modifier.padding(8.dp)) {
                         Text(
                             text = item.name,
                             style = TextStyle(fontSize = 16.sp),

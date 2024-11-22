@@ -16,11 +16,13 @@ import com.example.danceclub.data.remote.RepositoryProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 class TrainingScreenViewModel(application: Application) : AndroidViewModel(application) {
     private val personDao: PersonsDao = AppDatabase.getInstance(application).personsDao()
     private val trainingDao: TrainingDao = AppDatabase.getInstance(application).trainingsDao()
-    private val trainingSignDao: TrainingSignDao = AppDatabase.getInstance(application).trainingSignsDao()
+    private val trainingSignDao: TrainingSignDao =
+        AppDatabase.getInstance(application).trainingSignsDao()
     private val repository = RepositoryProvider.getRepository()
     private val _trainings: MutableLiveData<List<Training>> = MutableLiveData(emptyList())
     val trainings: LiveData<List<Training>> get() = _trainings
@@ -29,11 +31,13 @@ class TrainingScreenViewModel(application: Application) : AndroidViewModel(appli
 
     init {
         getTraining()
+        Log.d("Doing", LocalDate.now().monthValue.toString())
+        currentMonthTrainings(LocalDate.now().monthValue.toInt())
     }
 
     fun updateCurrentTrainings(newTraining: Training) {
         _currentTraining.postValue(newTraining)
-        Log.d("Doing",_currentTraining.value.toString())
+        Log.d("Doing", _currentTraining.value.toString())
     }
 
     private fun getTraining() {
@@ -45,24 +49,25 @@ class TrainingScreenViewModel(application: Application) : AndroidViewModel(appli
             }
         }
     }
-    fun getCurrentPerson():Person = repository.currentPerson
 
-    suspend fun singInTraining(person: String):String? {
+    fun getCurrentPerson(): Person = repository.currentPerson
+
+    suspend fun singInTraining(person: String): String? {
         return repository.postSign(currentTraining.value!!, person)
     }
 
-    suspend fun isSignedIn(trainingId:String): Boolean{
+    suspend fun isSignedIn(trainingId: String): Boolean {
         return withContext(Dispatchers.IO) {
-            if (trainingSignDao.getById(trainingId) != null) true
-            else false
+            trainingSignDao.getById(trainingId) != null
         }
     }
 
-    fun currentMonthTrainings(month: Int): List<Training>? {
+    fun currentMonthTrainings(month: Int):List<Training>? {
         val trainingList = trainings.value
         val trainingWithMonth: MutableList<Training> = mutableListOf()
-        if (month == 0)
+        if (month == 0) {
             return trainingList
+        }
         if (trainingList != null) {
             for (i in trainingList) {
                 if (i.date.monthValue == month)
@@ -70,7 +75,6 @@ class TrainingScreenViewModel(application: Application) : AndroidViewModel(appli
             }
         }
         return trainingWithMonth
-
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.danceclub.data.remote
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.compose.foundation.layout.size
 import android.net.Uri
 import android.util.Log
 import com.example.danceclub.data.local.dao.PersonsDao

@@ -14,11 +14,9 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,15 +38,12 @@ fun DetailItem(
     changeVisibility: () -> Unit,
     singInTraining: suspend (String) -> String?,
     personId: String,
-    isSignedInFunction: suspend (String) -> Boolean
+    isSignedInResult: Boolean
 ) {
     BackHandler { changeVisibility() }
     val snackbarHostState = remember { SnackbarHostState() }
-    var isSignedIn by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
-    LaunchedEffect(training.id) {
-        isSignedIn = isSignedInFunction(training.id)
-    }
+    var isSignedIn by remember { mutableStateOf(isSignedInResult) }
+
     Column(
         modifier = Modifier
             .padding(top = contentPadding.calculateTopPadding(), start = 16.dp)
@@ -136,7 +131,7 @@ fun DetailItem(
         Button(onClick = {
             CoroutineScope(Dispatchers.IO).launch {
                 var result: String? = null
-                if (isSignedIn == false) {
+                if (!isSignedIn) {
                     result = singInTraining(personId)
                     isSignedIn = true
                 }
