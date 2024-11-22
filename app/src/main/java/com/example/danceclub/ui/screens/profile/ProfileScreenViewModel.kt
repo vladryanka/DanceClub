@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
-import androidx.compose.runtime.remember
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -84,14 +83,7 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
     }
 
     suspend fun getImage():String? {
-        val imageString = repository.getImage()
-
-
-        if (bitmap != null) {
-            return bitmap
-        } else {
-            return null
-        }
+        return repository.getImage()
     }
 
 

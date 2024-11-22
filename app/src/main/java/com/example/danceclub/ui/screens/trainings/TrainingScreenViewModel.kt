@@ -32,7 +32,7 @@ class TrainingScreenViewModel(application: Application) : AndroidViewModel(appli
     init {
         getTraining()
         Log.d("Doing", LocalDate.now().monthValue.toString())
-        currentMonthTrainings(LocalDate.now().monthValue.toInt())
+        currentMonthTrainings(LocalDate.now().monthValue)
     }
 
     fun updateCurrentTrainings(newTraining: Training) {
