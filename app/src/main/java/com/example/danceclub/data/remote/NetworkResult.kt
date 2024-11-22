@@ -11,14 +11,14 @@ sealed class NetworkResult<out T> {
 }
 
 suspend fun <T : Any> handleApi(
-    execute: suspend () -> Response<T>
+    execute: suspend () -> Response<T>,
 ): NetworkResult<T> {
     return try {
         val response = execute()
 
         if (response.isSuccessful) {
             val body = response.body()
-            Log.d("Doing", "в handleApi "+body.toString())
+//            Log.d("Doing", "в handleApi " + body.toString())
             if (body != null) {
                 NetworkResult.Success(response.code(), body)
             } else {
@@ -30,17 +30,18 @@ suspend fun <T : Any> handleApi(
                 401 -> NetworkResult.Error(response.code(), "Incorrect username and password")
                 409 -> NetworkResult.Error(response.code(), "User with same phone already exists")
                 422 -> {
-                    Log.d("Doing",response.errorBody()?.string().toString())
+                    Log.d("Doing", response.errorBody()?.string().toString())
                     NetworkResult.Error(response.code(), "Validation Error")
                 }
+
                 else -> NetworkResult.Error(response.code(), "Unknown Error")
             }
         }
     } catch (e: HttpException) {
-        Log.d("Doing", "HttpException" +e.message().toString())
+        Log.d("Doing", "HttpException" + e.message().toString())
         NetworkResult.Error(e.code(), e.message())
     } catch (e: Throwable) {
-        Log.d("Doing","Throwable" +e.toString())
+        Log.d("Doing", "Throwable $e")
         NetworkResult.Exception(e)
     }
 }

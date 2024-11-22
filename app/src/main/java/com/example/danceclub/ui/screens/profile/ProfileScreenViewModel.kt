@@ -2,11 +2,9 @@ package com.example.danceclub.ui.screens.profile
 
 import android.app.Application
 import android.content.ContentResolver
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Base64
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -49,16 +47,12 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
         return trainingDao.getById(trainingId)
     }
 
-    fun base64ToBitmap(base64String: String): Bitmap? {
-        val decodedString = Base64.decode(base64String, Base64.DEFAULT)
-        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-    }
-    suspend fun getListNamesOfTraining(): List<Training>? {
+    suspend fun getListNamesOfTraining(): List<Training> {
         return withContext(Dispatchers.IO) {
             val list: MutableList<Training> = mutableListOf()
             Log.d("Doing", trainingSign.value.toString())
             val listOfSigned = trainingSignDao.getTrainingSignsSync()
-            Log.d("Doing", "listOfSigned = "+listOfSigned.toString())
+            Log.d("Doing", "listOfSigned = $listOfSigned")
             for (i in listOfSigned) {
                 val training = findTrainingNameById(i.trainingId)
                 if (training != null) {
@@ -69,23 +63,21 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
-    suspend fun saveImage(image: Uri, contentResolver: ContentResolver):String? {
-
+    suspend fun saveImage(image: Uri, contentResolver: ContentResolver): String? {
         val result = repository.putImage(image, contentResolver)
 
         if (result == "1") _savedImage.postValue(true)
         else _savedImage.postValue(false)
         result?.let {
-            Log.d("Doing", "В профиле в методе saveImage "+result)
+            Log.d("Doing", "В профиле в методе saveImage $result")
         }
-        return result
 
+        return result
     }
 
-    suspend fun getImage():String? {
+    suspend fun getImage(): ImageBitmap? {
         return repository.getImage()
     }
-
 
     private fun fetchAndStoreTrainings() {
         viewModelScope.launch {
@@ -103,6 +95,5 @@ class ProfileScreenViewModel(application: Application) : AndroidViewModel(applic
             _trainingSigns.postValue(trainingSignList)
         }
     }
-
 
 }

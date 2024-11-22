@@ -41,7 +41,7 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrainingsScreen(
-    trainingScreenViewModel: TrainingScreenViewModel = viewModel(),
+    trainingScreenViewModel: TrainingsScreenViewModel = viewModel(),
     onNavigateUpToProfile: () -> Unit
 ) {
 
@@ -127,12 +127,7 @@ fun TrainingsScreen(
             }
 
             false -> {
-                /*LaunchedEffect(Unit) {
-                    trainingSignsWithMonth = trainingScreenViewModel
-                        .currentMonthTrainings(LocalDate.now().monthValue)?: emptyList()
-                        Log.d("Doing", "в основном " + isSignedIn.toString())
-                }*/
-                TrainingCardsItem(
+                TrainingsCards(
                     contentPadding,
                     trainingScreenViewModel::updateCurrentTrainings,
                     ::changeVisibility,

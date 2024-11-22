@@ -41,7 +41,11 @@ fun DanceAppNavHost(
             SignInScreen(
                 onNavigateToProfile = { person: Person ->
                     val personJson = Json.encodeToString(person)
-                    navController.navigate(route = "$ProfileDestination/$personJson")
+                    navController.navigate(route = "$ProfileDestination/$personJson") {
+                        popUpTo<ProfileDestination> {
+                            inclusive = true
+                        }
+                    }
                 },
                 onNavigateUpToGreeting = {
                     navController.navigateUp()
@@ -52,8 +56,7 @@ fun DanceAppNavHost(
             RegistrationScreen(
                 onNavigateToProfile = { person: Person ->
                     val personJson = Json.encodeToString(person)
-                    navController.navigate(route = "$ProfileDestination/$personJson")
-                    {
+                    navController.navigate(route = "$ProfileDestination/$personJson") {
                         popUpTo<ProfileDestination> {
                             inclusive = true
                         }
