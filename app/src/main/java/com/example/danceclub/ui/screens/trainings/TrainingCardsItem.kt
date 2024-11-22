@@ -29,6 +29,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,7 +56,7 @@ fun TrainingCardsItem(
     contentPadding: PaddingValues,
     updateCurrentTrainings: (Training) -> Unit,
     changeVisibility: () -> Unit,
-    currentMonthTrainings: (Int) -> List<Training>?
+    currentMonthTrainings:(Int)->List<Training>?
 ) {
     val months = listOf(
         "Все", "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
@@ -64,13 +65,17 @@ fun TrainingCardsItem(
     var expanded by remember { mutableStateOf(false) }
 
     var selectedMonth by remember { mutableStateOf(months[LocalDate.now().monthValue]) }
+
     val isChecked: Boolean by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    //var trainingList = currentMonthTrainings(LocalDate.now().monthValue)
-    var trainingList by remember { mutableStateOf(currentMonthTrainings(LocalDate.now().monthValue)) }
+    var trainingList = currentMonthTrainings(LocalDate.now().monthValue)
+    /*var trainingList by remember { mutableStateOf(currentMonthTrainings) }
+    LaunchedEffect(currentMonthTrainings) {
+        trainingList = currentMonthTrainings
+    }*/
 
     Column(
         modifier = Modifier
